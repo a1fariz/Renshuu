@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Renshuu — Belajar Bahasa Jepang (Fase 0 sampai N4)</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-kana">練</span>
+      <span class="brand-teks">Renshuu</span>
+    </div>
+    <nav class="nav" id="nav">
+      <button class="nav-btn aktif" data-halaman="beranda">Beranda</button>
+      <button class="nav-btn" data-halaman="belajar">Huruf</button>
+      <button class="nav-btn" data-halaman="latihan">Latihan</button>
+      <button class="nav-btn" data-halaman="mirip">Huruf Mirip</button>
+      <button class="nav-btn" data-halaman="baca">Baca Kata</button>
+      <button class="nav-btn" data-halaman="kanji">Kanji</button>
+      <button class="nav-btn" data-halaman="kosakata">Kosakata</button>
+      <button class="nav-btn" data-halaman="grammar">Grammar</button>
+      <button class="nav-btn" data-halaman="aturan">Aturan</button>
+      <button class="nav-btn" data-halaman="peta">Peta Jalan</button>
+      <button class="nav-btn" data-halaman="cadangan">Cadangan</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wadah">
+
+  <!-- ============ BERANDA ============ -->
+  <section class="halaman aktif" id="halaman-beranda">
+    <div class="sambutan">
+      <h1>おはよう。Mari mulai.</h1>
+      <p class="sambutan-sub">
+        Aplikasi ini tidak punya nilai, skor, atau persentase. Tidak ada yang
+        dihitung benar atau salah. Yang ada hanya tiga keadaan: belum disentuh,
+        masih dilatih, sudah dikuasai. Salah itu bagian dari caranya bekerja.
+      </p>
+    </div>
+
+    <div class="kartu-baris" id="ringkas-beranda"></div>
+
+    <div class="panel">
+      <h2>Hari ini</h2>
+      <div id="tugas-hari-ini"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Ulangan harian</h2>
+      <p class="petunjuk">
+        Semua kanji, kosakata, dan grammar yang jatuh tempo hari ini,
+        dikerjakan sekaligus dalam satu sesi.
+      </p>
+      <div id="ringkas-harian"></div>
+      <div id="area-kuis-harian" class="sembunyi"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Mulai dari mana?</h2>
+      <div class="pintasan">
+        <button class="tombol besar" data-pintasan="belajar-a">
+          <strong>Belum pernah belajar kana</strong>
+          <span>Mulai dari baris あ (a i u e o)</span>
+        </button>
+        <button class="tombol besar" data-pintasan="latihan">
+          <strong>Sudah kenal beberapa huruf</strong>
+          <span>Langsung latihan campuran</span>
+        </button>
+        <button class="tombol besar" data-pintasan="mirip">
+          <strong>Sering tertukar シ dan ツ</strong>
+          <span>Latihan khusus huruf mirip</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BELAJAR HURUF ============ -->
+  <section class="halaman" id="halaman-belajar">
+    <h1>Belajar Huruf</h1>
+    <p class="petunjuk">
+      Pelajari satu sampai dua baris per hari. Jangan lebih. Baca mnemonic-nya,
+      tulis ulang di kertas sambil mengikuti urutan coretan, lalu ucapkan
+      contoh katanya dengan suara. Itu yang membuatnya menempel.
+    </p>
+
+    <div class="pilih-sistem" id="pilih-sistem">
+      <button class="pil aktif" data-sistem="hiragana">Hiragana</button>
+      <button class="pil" data-sistem="katakana">Katakana</button>
+      <button class="pil" data-sistem="dakuten">Dakuten &amp; Handakuten</button>
+      <button class="pil" data-sistem="youon">Youon</button>
+      <button class="pil" data-sistem="serapan">Bunyi Serapan</button>
+    </div>
+
+    <div class="pilih-baris" id="pilih-baris"></div>
+    <div class="grid-kana" id="grid-kana"></div>
+  </section>
+
+  <!-- ============ LATIHAN (SRS + KUIS) ============ -->
+  <section class="halaman" id="halaman-latihan">
+    <h1>Latihan</h1>
+
+    <div id="setelan-latihan">
+      <p class="petunjuk">
+        Pilih apa yang mau dilatih. Kuis berhenti kalau kamu menekan
+        &ldquo;Sudah paham&rdquo;. Tidak ada batas soal, tidak ada nilai akhir.
+      </p>
+
+      <div class="panel">
+        <h2>Materi</h2>
+        <div class="pilih-sistem" id="pilih-materi">
+          <button class="pil aktif" data-materi="hiragana">Hiragana</button>
+          <button class="pil" data-materi="katakana">Katakana</button>
+          <button class="pil" data-materi="campuran">Campuran keduanya</button>
+          <button class="pil" data-materi="dakuten">Dakuten &amp; Handakuten</button>
+          <button class="pil" data-materi="youon">Youon</button>
+          <button class="pil" data-materi="semua">Semua huruf</button>
+          <button class="pil" data-materi="jatuhtempo">Yang jatuh tempo hari ini</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Jenis soal</h2>
+        <div class="pilih-sistem" id="pilih-jenis">
+          <button class="pil aktif" data-jenis="acak">Acak semua jenis</button>
+          <button class="pil" data-jenis="huruf-bunyi">Huruf &rarr; bunyi</button>
+          <button class="pil" data-jenis="bunyi-huruf">Bunyi &rarr; huruf</button>
+          <button class="pil" data-jenis="ketik">Ketik bacaannya</button>
+        </div>
+      </div>
+
+      <button class="tombol utama besar-penuh" id="mulai-latihan">Mulai latihan</button>
+    </div>
+
+    <div id="area-kuis" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ HURUF MIRIP ============ -->
+  <section class="halaman" id="halaman-mirip">
+    <h1>Huruf Mirip</h1>
+    <p class="petunjuk">
+      Ini penyebab paling umum orang merasa &ldquo;sudah hafal tapi tetap tidak bisa baca&rdquo;.
+      Pelajari kuncinya dulu, lalu latih membedakannya.
+    </p>
+    <div id="daftar-mirip"></div>
+    <div class="panel">
+      <button class="tombol utama besar-penuh" id="mulai-mirip">Latih membedakan huruf mirip</button>
+    </div>
+    <div id="area-kuis-mirip" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ BACA KATA ============ -->
+  <section class="halaman" id="halaman-baca">
+    <h1>Baca Kata Utuh</h1>
+    <p class="petunjuk">
+      Menghafal huruf lepas tidak sama dengan bisa membaca. Di sini kamu membaca
+      kata utuh — ini latihan yang menentukan kelulusan Fase 0.
+    </p>
+    <div class="panel">
+      <h2>Tingkat</h2>
+      <div class="pilih-sistem" id="pilih-tingkat-baca">
+        <button class="pil aktif" data-tingkat="hiragana">Hiragana saja</button>
+        <button class="pil" data-tingkat="katakana">Katakana saja</button>
+        <button class="pil" data-tingkat="campuran">Campuran</button>
+      </div>
+      <button class="tombol utama besar-penuh" id="mulai-baca">Mulai membaca</button>
+    </div>
+    <div id="area-baca" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ KANJI ============ -->
+  <section class="halaman" id="halaman-kanji">
+    <h1>Kanji</h1>
+    <p class="petunjuk">
+      Jangan mulai kanji sebelum kana lancar. Setelah itu, target yang masuk akal
+      adalah 5 kanji per hari. Baca artinya, lihat contoh katanya, lalu tulis
+      ulang di kertas. Menulis dengan tangan yang membuat bentuknya menempel.
+    </p>
+
+    <div class="pilih-sistem" id="pilih-level-kanji">
+      <button class="pil aktif" data-level="N5">N5</button>
+      <button class="pil" data-level="N4">N4</button>
+    </div>
+
+    <div class="pilih-baris" id="pilih-tema-kanji"></div>
+    <div class="grid-kana" id="grid-kanji"></div>
+
+    <div class="panel">
+      <button class="tombol utama besar-penuh" id="mulai-kuis-kanji">Latih kanji yang tampil</button>
+    </div>
+    <div id="area-kuis-kanji" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ KOSAKATA ============ -->
+  <section class="halaman" id="halaman-kosakata">
+    <h1>Kosakata</h1>
+    <p class="petunjuk">
+      Kata dikelompokkan per tema, bukan per abjad. Belajar &ldquo;makanan&rdquo; sekaligus
+      lebih menempel daripada kata acak, karena otak menyimpannya sebagai satu kelompok.
+    </p>
+
+    <div class="pilih-sistem" id="pilih-level-kosakata">
+      <button class="pil aktif" data-level="N5">N5</button>
+      <button class="pil" data-level="N4">N4</button>
+    </div>
+
+    <div class="pilih-baris" id="pilih-tema-kosakata"></div>
+    <div id="daftar-kosakata"></div>
+
+    <div class="panel">
+      <button class="tombol utama besar-penuh" id="mulai-kuis-kosakata">Latih kata yang tampil</button>
+    </div>
+    <div id="area-kuis-kosakata" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ GRAMMAR ============ -->
+  <section class="halaman" id="halaman-grammar">
+    <h1>Grammar</h1>
+    <p class="petunjuk">
+      Urutannya sudah disusun dari yang paling mendasar. Kerjakan berurutan, jangan
+      melompat. Satu poin per hari sudah cukup kalau kamu benar-benar memahami contohnya.
+    </p>
+
+    <div class="pilih-sistem" id="pilih-level-grammar">
+      <button class="pil aktif" data-level="N5">N5</button>
+      <button class="pil" data-level="N4">N4</button>
+    </div>
+
+    <div id="daftar-grammar"></div>
+
+    <div class="panel">
+      <button class="tombol utama besar-penuh" id="mulai-kuis-grammar">Latih pola yang tampil</button>
+    </div>
+    <div id="area-kuis-grammar" class="sembunyi"></div>
+  </section>
+
+  <!-- ============ ATURAN KHUSUS ============ -->
+  <section class="halaman" id="halaman-aturan">
+    <h1>Aturan Khusus</h1>
+    <p class="petunjuk">
+      Empat hal ini kecil tapi sering diabaikan, dan justru inilah yang membuat
+      bacaan terdengar salah walaupun hurufnya sudah benar.
+    </p>
+    <div id="daftar-aturan"></div>
+  </section>
+
+  <!-- ============ PETA JALAN ============ -->
+  <section class="halaman" id="halaman-peta">
+    <h1>Peta Jalan</h1>
+    <div id="isi-peta"></div>
+  </section>
+
+  <!-- ============ CADANGAN ============ -->
+  <section class="halaman" id="halaman-cadangan">
+    <h1>Cadangan Progres</h1>
+    <p class="petunjuk">
+      Progres disimpan di dalam browser laptop ini. Kalau kamu membersihkan data
+      browser atau pindah laptop, progres itu hilang. Simpan file cadangan
+      sesekali supaya aman.
+    </p>
+
+    <div class="panel">
+      <h2>Simpan ke file</h2>
+      <p>Menghasilkan satu file JSON yang bisa kamu taruh di mana saja.</p>
+      <button class="tombol utama" id="tombol-export">Unduh file cadangan</button>
+    </div>
+
+    <div class="panel">
+      <h2>Pulihkan dari file</h2>
+      <p>Pilih file cadangan yang pernah kamu unduh. Progres sekarang akan ditimpa.</p>
+      <input type="file" id="input-import" accept=".json">
+      <div id="pesan-import"></div>
+    </div>
+
+    <div class="panel bahaya">
+      <h2>Mulai dari nol</h2>
+      <p>Menghapus seluruh progres di browser ini. Tidak bisa dibatalkan.</p>
+      <button class="tombol bahaya" id="tombol-reset">Hapus semua progres</button>
+    </div>
+
+    <div class="panel">
+      <h2>Sumber data dan rujukan</h2>
+      <p>Materi di aplikasi ini disusun mengacu pada sumber berikut:</p>
+      <ul class="daftar-sumber">
+        <li><strong>Kana</strong> — Tofugu Learn Hiragana / Katakana Guide, Real Kana, Kana Pro, NHK World</li>
+        <li><strong>Acuan ujian</strong> — JLPT Official (jlpt.jp), JEES, Japan Foundation JF Can-do</li>
+        <li><strong>Grammar</strong> — Bunpro, Tae Kim's Guide, Imabi, Genki I &amp; II, Minna no Nihongo</li>
+        <li><strong>Kanji &amp; kosakata</strong> — WaniKani, Anki (Kaishi 1.5k / Core 2k), Jisho.org, Tofugu</li>
+        <li><strong>Listening &amp; reading</strong> — NHK World Easy Japanese, JapanesePod101, Tadoku Graded Readers</li>
+        <li><strong>Latihan soal</strong> — JLPT Sensei, japanesetest4you, Try! N5 &amp; N4, Sou Matome N4</li>
+        <li><strong>Dataset gratis</strong> — JMdict/EDICT, KANJIDIC2, KanjiVG, Tatoeba</li>
+      </ul>
+      <p class="catatan-kecil">
+        Mnemonic Bahasa Indonesia dan contoh kata di aplikasi ini disusun khusus untuk
+        kamu, bukan salinan dari sumber di atas. Ketersediaan tiap situs
+        <em>perlu dicek</em> sendiri karena bisa berubah.
+      </p>
+      <p class="catatan-kecil">
+        Catatan lisensi kalau nanti dataset besar ditambahkan: JMdict dan KANJIDIC2
+        memakai lisensi Creative Commons BY-SA 4.0 dari Electronic Dictionary Research
+        and Development Group. KanjiVG memakai Creative Commons BY-SA 3.0. Tatoeba
+        memakai CC BY 2.0 FR. Semuanya mewajibkan pencantuman sumber.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>Dipakai sendiri, disimpan di laptop sendiri. Tanpa internet, tanpa akun, tanpa nilai.</p>
+</footer>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
