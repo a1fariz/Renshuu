@@ -526,6 +526,8 @@ export function inisialisasiAppListeners(): void {
       bukaHalaman('kosakata');
     } else if (aksi === 'buka-grammar') {
       bukaHalaman('grammar');
+    } else if (aksi === 'buka-sumber') {
+      bukaHalaman('sumber');
     }
   });
 

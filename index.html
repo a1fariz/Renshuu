@@ -26,6 +26,7 @@
       <button class="nav-btn" data-halaman="aturan">Aturan</button>
       <button class="nav-btn" data-halaman="peta">Peta Jalan</button>
       <button class="nav-btn" data-halaman="cadangan">Cadangan</button>
+      <button class="nav-btn" data-halaman="sumber">Sumber &amp; Lisensi</button>
     </nav>
   </div>
 </header>
@@ -308,10 +309,78 @@
     </div>
   </section>
 
+  <!-- ============ SUMBER & LISENSI ============ -->
+  <section class="halaman" id="halaman-sumber">
+    <h1>Sumber Data, Rujukan &amp; Lisensi Hak Cipta</h1>
+    <p class="petunjuk">
+      Aplikasi <strong>Renshuu (練習)</strong> dikembangkan sebagai platform pembelajaran mandiri non-komersial.
+      Semua dataset, kamus, dan rujukan kurikulum mengacu pada standar terbuka dan proyek open-source resmi berikut:
+    </p>
+
+    <div class="panel">
+      <h2>Dataset Open-Source &amp; Attribution Lisensi</h2>
+      <ul class="daftar-sumber">
+        <li>
+          <strong>JMdict / EDICT Database</strong> —
+          Dikembangkan oleh Electronic Dictionary Research and Development Group (EDRDG).
+          Digunakan di bawah lisensi <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</a>.
+        </li>
+        <li>
+          <strong>KANJIDIC2 Database</strong> —
+          Dikembangkan oleh EDRDG (On-yomi, Kun-yomi, jumlah coretan, dan arti Kanji N5 &amp; N4).
+          Digunakan di bawah lisensi <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.
+        </li>
+        <li>
+          <strong>KanjiVG Project</strong> —
+          Proyek visualisasi urutan coretan &amp; struktur stroke Kanji oleh Ulrich Apel &amp; kontributor.
+          Digunakan di bawah lisensi <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">CC BY-SA 3.0 Unported</a>.
+        </li>
+        <li>
+          <strong>Tatoeba Project</strong> —
+          Basis data contoh kalimat dan terjemahan oleh kontributor Tatoeba.org.
+          Digunakan di bawah lisensi <a href="https://creativecommons.org/licenses/by/2.0/fr/" target="_blank" rel="noopener">CC BY 2.0 FR</a>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Acuan Kurikulum &amp; Bahan Pembelajaran</h2>
+      <ul class="daftar-sumber">
+        <li><strong>Kana (Hiragana &amp; Katakana)</strong> — Tofugu Learn Hiragana/Katakana Guide, Real Kana, Kana Pro, NHK World Easy Japanese.</li>
+        <li><strong>Acuan Ujian &amp; Standar JLPT</strong> — JLPT Official (jlpt.jp), Japan Educational Exchanges and Services (JEES), Japan Foundation (JF Can-do).</li>
+        <li><strong>Grammar (Tata Bahasa)</strong> — Minna no Nihongo I &amp; II, Genki I &amp; II, Tae Kim's Guide to Learning Japanese, Imabi, Bunpro.</li>
+        <li><strong>Kosakata &amp; Kamus</strong> — Jisho.org, WaniKani, Anki Kaishi 1.5k / Core 2k Deck.</li>
+        <li><strong>Latihan Soal &amp; Membaca</strong> — JLPT Sensei, japanesetest4you, Try! N5 &amp; N4, Sou Matome N4, Tadoku Graded Readers.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Sintesis Suara &amp; Teknologi Interface</h2>
+      <p>
+        Audio pelafalan bahasa Jepang menggunakan pembungkus native <strong>Web Speech API (`ja-JP`)</strong> yang diproses secara langsung oleh mesin sintesis suara browser pengguna tanpa memerlukan server eksternal.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Hak Cipta Konten Orisinal &amp; Penafian (Disclaimer)</h2>
+      <p class="catatan-kecil">
+        Catatan Mnemonic Bahasa Indonesia, penjelasan tata bahasa, dan contoh pola latihan dalam aplikasi ini disusun khusus secara mandiri untuk membantu pembelajar di Indonesia dan bukan merupakan salinan langsung dari materi komersial.
+      </p>
+      <p class="catatan-kecil">
+        Seluruh merek dagang, nama produk, dan hak cipta pihak ketiga (seperti JLPT, Genki, Minna no Nihongo, Tofugu, WaniKani) dimiliki sepenuhnya oleh pemilik hak cipta masing-masing.
+      </p>
+    </div>
+  </section>
+
 </main>
 
 <footer class="footer">
-  <p>Dipakai sendiri, disimpan di laptop sendiri. Tanpa internet, tanpa akun, tanpa nilai.</p>
+  <p>
+    © Renshuu (練習) — Platform Belajar Bahasa Jepang Mandiri.
+    Dipakai sendiri, disimpan di laptop sendiri.
+    <br>
+    Mengacu pada <button class="link-btn" data-pintasan="buka-sumber">Sumber Rujukan &amp; Lisensi Open-Source (CC BY-SA 4.0)</button>.
+  </p>
 </footer>
 
 <script type="module" src="/src/main.ts"></script>

@@ -994,6 +994,21 @@ h3 {
 
 .footer p { font-size: 13px; color: var(--teks-lembut); }
 
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--aksen);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: var(--aksen-gelap);
+}
+
 /* ---------------- LAYAR KECIL ---------------- */
 @media (max-width: 640px) {
   .wadah { padding: 20px 14px 44px; }
