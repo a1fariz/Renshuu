@@ -1,5 +1,5 @@
 import {
-  HIRAGANA, KATAKANA, DAKUTEN, HANDAKUTEN, YOUON, SERAPAN, HURUF_MIRIP, ATURAN_KHUSUS, SEMUA_KANA
+  HIRAGANA, KATAKANA, DAKUTEN, HANDAKUTEN, YOUON, SERAPAN, HURUF_MIRIP, ATURAN_KHUSUS, SEMUA_KANA, URUTAN_BELAJAR
 } from '../data/kana';
 import { KANJI_N5, KANJI_N4, SEMUA_KANJI, TEMA_KANJI } from '../data/kanji';
 import { KOSAKATA_N5, KOSAKATA_N4, SEMUA_KOSAKATA, TEMA_KOSAKATA } from '../data/kosakata';
@@ -11,7 +11,7 @@ import {
   exportProgres, importProgres, resetProgres, hariIni, hitungStreak
 } from '../services/srs';
 import { ucapkan } from '../services/speech';
-import { kumpulanKuisKustom } from './kuis';
+import { kumpulanKuisKustom, gambarRingkasHarian } from './kuis';
 import type { KanaItem, KanjiItem, KosakataItem, GrammarBelajar, ProgresSRS } from '../types';
 
 export let PROGRES: ProgresSRS = muatProgres();
@@ -161,18 +161,35 @@ export function bukaHalaman(nama: string): void {
   const halaman = document.getElementById('halaman-' + nama);
   if (halaman) halaman.classList.add('aktif');
 
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktif'));
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.remove('aktif');
+    b.removeAttribute('aria-current');
+  });
   const tombol = document.querySelector(`.nav-btn[data-halaman="${nama}"]`);
   if (tombol) {
     tombol.classList.add('aktif');
+    tombol.setAttribute('aria-current', 'page');
     const grup = tombol.closest('.nav-grup');
-    if (grup) grup.querySelector('.nav-grup-induk')?.classList.add('aktif');
+    if (grup) {
+      const induk = grup.querySelector('.nav-grup-induk');
+      induk?.classList.add('aktif');
+      induk?.setAttribute('aria-expanded', 'true');
+    }
   }
 
   const nav = document.getElementById('nav');
   if (nav) nav.classList.remove('terbuka');
   const hamburger = document.getElementById('nav-hamburger');
-  if (hamburger) hamburger.textContent = '☰';
+  if (hamburger) {
+    hamburger.textContent = '☰';
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', 'Buka menu');
+  }
+
+  document.querySelectorAll('.nav-grup.terbuka').forEach(g => {
+    g.classList.remove('terbuka');
+    g.querySelector('.nav-grup-induk')?.setAttribute('aria-expanded', 'false');
+  });
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -217,7 +234,7 @@ export function kartuRingkas(nama: string, daftarId: string[], satuan: string): 
 }
 
 export function gambarTugasHariIni(): void {
-  const semuaId = SEMUA_KANA.map(k => k.tipe + '-' + k.kana);
+  const semuaId = URUTAN_BELAJAR.map(k => k.tipe + '-' + k.kana);
   const jatuhTempo = kartuJatuhTempo(PROGRES, semuaId);
   const belumTersentuh = semuaId.filter(id => !PROGRES.kartu[id]);
 
@@ -264,8 +281,8 @@ export function gambarTugasHariIni(): void {
   });
 
   if (belumTersentuh.length > 0) {
-    const berikutnya = SEMUA_KANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
-    const limaBerikutnya = SEMUA_KANA
+    const berikutnya = URUTAN_BELAJAR.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+    const limaBerikutnya = URUTAN_BELAJAR
       .filter(k => !PROGRES.kartu[k.tipe + '-' + k.kana])
       .slice(0, 5);
 
@@ -280,7 +297,7 @@ export function gambarTugasHariIni(): void {
         </div>`;
     }
 
-    const disentuhHariIni = SEMUA_KANA.filter(k => {
+    const disentuhHariIni = URUTAN_BELAJAR.filter(k => {
       const kartu = PROGRES.kartu[k.tipe + '-' + k.kana];
       return kartu && kartu.terakhirDilihat === hariIni() && kartu.kaliDilihat === 1;
     }).length;
@@ -324,9 +341,9 @@ export function gambarTugasHariIni(): void {
     d.setDate(d.getDate() - i);
     const tgl = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const aktif = hariAktif.has(tgl);
-    const hariIni = i === 0;
+    const tanggalIni = i === 0;
     const label = d.getDate();
-    kalenderHtml += `<span class="hari-kal ${aktif ? 'aktif' : ''} ${hariIni ? 'ini' : ''}" title="${tgl}">${label}</span>`;
+    kalenderHtml += `<span class="hari-kal ${aktif ? 'aktif' : ''} ${tanggalIni ? 'ini' : ''}" title="${tgl}">${label}</span>`;
   }
   kalenderHtml += '</div>';
 
@@ -363,13 +380,15 @@ export function gambarPanduanLangkah(): void {
   const idKatakana = KATAKANA.map(k => k.tipe + '-' + k.kana);
   const idDakuten = [...DAKUTEN, ...HANDAKUTEN].map(k => k.tipe + '-' + k.kana);
   const idYouon = YOUON.map(k => k.tipe + '-' + k.kana);
+  const idSerapan = SERAPAN.map(k => k.tipe + '-' + k.kana);
 
   const hDikuasai = ringkasProgres(PROGRES, idHiragana).dikuasai;
   const kDikuasai = ringkasProgres(PROGRES, idKatakana).dikuasai;
   const dDikuasai = ringkasProgres(PROGRES, idDakuten).dikuasai;
   const yDikuasai = ringkasProgres(PROGRES, idYouon).dikuasai;
+  const sDikuasai = ringkasProgres(PROGRES, idSerapan).dikuasai;
 
-  const adaProgres = (hDikuasai + kDikuasai + dDikuasai + yDikuasai) > 0;
+  const adaProgres = (hDikuasai + kDikuasai + dDikuasai + yDikuasai + sDikuasai) > 0;
 
   if (!adaProgres) {
     const htmlLangkah = `
@@ -428,6 +447,9 @@ export function gambarPanduanLangkah(): void {
     pesan = `Sekarang bagian katakana. ${kDikuasai} dari ${KATAKANA.length} huruf sudah dikuasai. ` +
       (berikutnya ? `Huruf berikutnya: <strong>${berikutnya.kana} (${berikutnya.romaji})</strong>.` : '');
     tombolHtml = `<button class="tombol utama" data-pintasan="belajar-katakana">Lanjutkan katakana</button>`;
+  } else if (sDikuasai < SERAPAN.length) {
+    pesan = `Terakhir, kuasai bunyi serapan seperti fa, ti, dan she. ${sDikuasai} dari ${SERAPAN.length} sudah dikuasai.`;
+    tombolHtml = `<button class="tombol utama" data-pintasan="belajar-serapan">Pelajari bunyi serapan</button>`;
   } else {
     pesan = 'Kana lengkap. Saatnya menguji dengan membaca kata utuh, bukan huruf lepas.';
     tombolHtml = `<button class="tombol utama" data-pintasan="baca">Baca kata utuh</button>`;
@@ -451,7 +473,8 @@ export function gambarBeranda(): void {
     { nama: 'Hiragana', daftar: HIRAGANA, satuan: 'huruf' },
     { nama: 'Katakana', daftar: KATAKANA, satuan: 'huruf' },
     { nama: 'Dakuten', daftar: [...DAKUTEN, ...HANDAKUTEN], satuan: 'huruf' },
-    { nama: 'Youon', daftar: YOUON, satuan: 'huruf' }
+    { nama: 'Youon', daftar: YOUON, satuan: 'huruf' },
+    { nama: 'Bunyi Serapan', daftar: SERAPAN, satuan: 'huruf' }
   ];
 
   let html = '';
@@ -794,6 +817,11 @@ export function inisialisasiAppListeners(): void {
 
   const toggleGelap = document.getElementById('toggle-gelap');
   if (toggleGelap) {
+    const perbaruiAriaTema = () => toggleGelap.setAttribute(
+      'aria-pressed',
+      String(document.documentElement.getAttribute('data-theme') === 'gelap')
+    );
+    perbaruiAriaTema();
     toggleGelap.addEventListener('click', function () {
       const gelap = document.documentElement.getAttribute('data-theme') === 'gelap';
       if (gelap) {
@@ -803,6 +831,7 @@ export function inisialisasiAppListeners(): void {
         document.documentElement.setAttribute('data-theme', 'gelap');
         localStorage.setItem('renshuu-tema', 'gelap');
       }
+      perbaruiAriaTema();
     });
   }
 
@@ -820,6 +849,8 @@ export function inisialisasiAppListeners(): void {
     hamburger.addEventListener('click', function () {
       const terbuka = nav.classList.toggle('terbuka');
       hamburger.textContent = terbuka ? '×' : '☰';
+      hamburger.setAttribute('aria-expanded', String(terbuka));
+      hamburger.setAttribute('aria-label', terbuka ? 'Tutup menu' : 'Buka menu');
     });
   }
 
@@ -829,14 +860,23 @@ export function inisialisasiAppListeners(): void {
       const grup = this.closest('.nav-grup');
       if (!grup) return;
       const sudahTerbuka = grup.classList.contains('terbuka');
-      document.querySelectorAll('.nav-grup.terbuka').forEach(g => g.classList.remove('terbuka'));
-      if (!sudahTerbuka) grup.classList.add('terbuka');
+      document.querySelectorAll('.nav-grup.terbuka').forEach(g => {
+        g.classList.remove('terbuka');
+        g.querySelector('.nav-grup-induk')?.setAttribute('aria-expanded', 'false');
+      });
+      if (!sudahTerbuka) {
+        grup.classList.add('terbuka');
+        this.setAttribute('aria-expanded', 'true');
+      }
     });
   });
 
   document.addEventListener('click', function (e) {
     if (!(e.target as HTMLElement).closest('.nav-grup')) {
-      document.querySelectorAll('.nav-grup.terbuka').forEach(g => g.classList.remove('terbuka'));
+      document.querySelectorAll('.nav-grup.terbuka').forEach(g => {
+        g.classList.remove('terbuka');
+        g.querySelector('.nav-grup-induk')?.setAttribute('aria-expanded', 'false');
+      });
     }
   });
 
@@ -874,6 +914,11 @@ export function inisialisasiAppListeners(): void {
       barisAktif = 'semua';
       bukaHalaman('belajar');
       perbaruiTampilanBelajar();
+    } else if (aksi === 'belajar-serapan') {
+      sistemAktif = 'serapan';
+      barisAktif = 'semua';
+      bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
     } else if (aksi === 'konsep') {
       bukaHalaman('konsep');
     } else if (aksi === 'baca') {
@@ -902,7 +947,7 @@ export function inisialisasiAppListeners(): void {
         kumpulanKuisKustom(lima, 'Target hari ini: ' + lima.map(k => k.kana).join(' '));
       }
     } else if (aksi === 'latihan-jatuhtempo') {
-      const semuaId = SEMUA_KANA.map(k => k.tipe + '-' + k.kana);
+      const semuaId = URUTAN_BELAJAR.map(k => k.tipe + '-' + k.kana);
       const tempo = kartuJatuhTempo(PROGRES, semuaId);
       const daftar = SEMUA_KANA.filter(k => tempo.includes(k.tipe + '-' + k.kana));
       if (daftar.length > 0) {
@@ -1058,6 +1103,12 @@ export function inisialisasiAppListeners(): void {
           reloadProgres();
           gambarBeranda();
           gambarGridKana();
+          gambarGridKanji();
+          gambarDaftarKosakata();
+          gambarDaftarGrammar();
+          gambarRingkasanBelajar();
+          gambarAreaTes();
+          gambarRingkasHarian();
         }
       });
     });
@@ -1077,6 +1128,12 @@ export function inisialisasiAppListeners(): void {
       reloadProgres();
       gambarBeranda();
       gambarGridKana();
+      gambarGridKanji();
+      gambarDaftarKosakata();
+      gambarDaftarGrammar();
+      gambarRingkasanBelajar();
+      gambarAreaTes();
+      gambarRingkasHarian();
 
       const kotak = document.getElementById('pesan-import');
       if (kotak) {

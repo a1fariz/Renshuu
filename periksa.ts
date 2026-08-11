@@ -223,7 +223,7 @@ if (fs.existsSync(htmlPath)) {
     'umpan-mirip', 'petunjuk-mirip', 'ganti-mirip', 'selesai-mirip', 'lanjut-mirip',
     'mirip-lagi', 'jawab-baca', 'buka-baca', 'ganti-baca', 'selesai-baca', 'baca-lagi',
     'umpan-n', 'petunjuk-n', 'ulang-n', 'lewati-n', 'selesai-n', 'lanjut-n', 'lagi-n',
-    'mulai-harian'
+    'mulai-harian', 'tombol-dengar-kuis'
   ]);
 
   ['src/ui/app.ts', 'src/ui/kuis.ts'].forEach(relFile => {

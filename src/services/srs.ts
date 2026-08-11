@@ -38,6 +38,8 @@ export function perbaruiKartu(kartu: KartuSRS, lancar: boolean): KartuSRS {
     kartu.tahap = Math.min(kartu.tahap + 1, JADWAL_HARI.length - 1);
   } else {
     kartu.tahap = Math.max(kartu.tahap - 2, 0);
+    kartu.jatuhTempo = hariIni();
+    return kartu;
   }
 
   const jarakHari = JADWAL_HARI[kartu.tahap];
@@ -206,13 +208,17 @@ export function hitungStreak(progres: ProgresSRS): { streak: number; hariAktif: 
 
   const hariAktif = new Set(hariSet);
   let streak = 0;
-  let tanggal = new Date();
+  const tanggal = new Date();
+  const hariIniStr = hariIni();
+  const tanggalMulai = hariSet.has(hariIniStr) ? tanggal : new Date(tanggal.setDate(tanggal.getDate() - 1));
+  let tanggalCek = tanggalMulai;
 
   while (true) {
-    const tgl = `${tanggal.getFullYear()}-${String(tanggal.getMonth() + 1).padStart(2, '0')}-${String(tanggal.getDate()).padStart(2, '0')}`;
+    const tgl = `${tanggalCek.getFullYear()}-${String(tanggalCek.getMonth() + 1).padStart(2, '0')}-${String(tanggalCek.getDate()).padStart(2, '0')}`;
     if (hariSet.has(tgl)) {
       streak++;
-      tanggal.setDate(tanggal.getDate() - 1);
+      tanggalCek = new Date(tanggalCek);
+      tanggalCek.setDate(tanggalCek.getDate() - 1);
     } else {
       break;
     }

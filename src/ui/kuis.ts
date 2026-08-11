@@ -1,5 +1,5 @@
 import {
-  HIRAGANA, KATAKANA, DAKUTEN, HANDAKUTEN, YOUON, SEMUA_KANA, HURUF_MIRIP
+  HIRAGANA, KATAKANA, DAKUTEN, HANDAKUTEN, YOUON, SERAPAN, SEMUA_KANA, HURUF_MIRIP
 } from '../data/kana';
 import { KATA_HIRAGANA, KATA_KATAKANA, KATA_CAMPURAN } from '../data/kata';
 import { KALIMAT_HIRAGANA, KALIMAT_CAMPURAN } from '../data/kalimat';
@@ -36,6 +36,7 @@ export function kumpulanKuis(): KanaItem[] {
   if (materiKuis === 'campuran') return [...HIRAGANA, ...KATAKANA];
   if (materiKuis === 'dakuten') return [...DAKUTEN, ...HANDAKUTEN];
   if (materiKuis === 'youon') return YOUON;
+  if (materiKuis === 'serapan') return SERAPAN;
   if (materiKuis === 'semua') return SEMUA_KANA;
 
   if (materiKuis === 'jatuhtempo') {
@@ -282,7 +283,7 @@ export function gambarSoal(idArea: string): void {
     <div class="panel kuis">
       ${materiKuis === 'dipelajari' || materiKuis === 'kustom' ? `<p class="konteks-kuis">${labelKuis}</p>` : ''}
       ${isiSoal}
-      <div id="umpan-balik" class="umpan-balik"></div>
+      <div id="umpan-balik" class="umpan-balik" role="status" aria-live="polite"></div>
       <div class="kuis-alat">
         <button class="tombol halus" id="tombol-petunjuk">Beri petunjuk</button>
         <button class="tombol halus" id="tombol-ulang">Ulang soal ini</button>
@@ -435,8 +436,7 @@ export function pasangAlatKuis(idArea: string): void {
   const ulangBtn = document.getElementById('tombol-ulang');
   if (ulangBtn) {
     ulangBtn.addEventListener('click', function () {
-      const jenisLain = JENIS_TERSEDIA.filter(j => j !== jenisSoalSekarang);
-      jenisSoalSekarang = jenisKuis === 'acak' ? satuAcak(jenisLain) : jenisKuis;
+      tingkatPetunjuk = 0;
       gambarSoal(idArea);
     });
   }
@@ -513,7 +513,7 @@ export function soalMirip(): void {
       <div class="pilihan-jawab pilihan-kana">
         ${pilihan.map(p => `<button class="tombol-jawab kana-pilihan" data-mirip="${p}">${p}</button>`).join('')}
       </div>
-      <div id="umpan-mirip" class="umpan-balik"></div>
+      <div id="umpan-mirip" class="umpan-balik" role="status" aria-live="polite"></div>
       <div class="kuis-alat">
         <button class="tombol halus" id="petunjuk-mirip">Beri petunjuk</button>
         <button class="tombol halus" id="ganti-mirip">Ganti soal</button>
@@ -592,7 +592,14 @@ export function kumpulanKata() {
 export function soalBaca(): void {
   const area = document.getElementById('area-baca');
   if (!area) return;
-  kataSekarang = satuAcak(kumpulanKata());
+  const kumpulan = kumpulanKata();
+  if (kumpulan.length === 0) {
+    area.innerHTML = '<div class="panel"><p class="petunjuk">Belum ada bahan bacaan untuk tingkat ini.</p></div>';
+    area.classList.remove('sembunyi');
+    return;
+  }
+  kataSekarang = satuAcak(kumpulan);
+  if (!kataSekarang) return;
 
   area.innerHTML = `
     <div class="panel kuis">
@@ -785,7 +792,7 @@ export function pilihItemN(): any {
 
   if (p.campuran) {
     const segarDulu = kumpulan.filter(segar);
-    terpilih = (segarDulu.length > 0 ? segarDulu : kumpulan)[0];
+    terpilih = satuAcak(segarDulu.length > 0 ? segarDulu : kumpulan);
   } else if (jatuhTempo.length > 0 && Math.random() < 0.6) {
     terpilih = satuAcak(jatuhTempo);
   } else if (belum.length > 0) {
@@ -862,7 +869,7 @@ export function gambarSoalN(): void {
   area.innerHTML = `
     <div class="panel kuis">
       ${isiSoal}
-      <div id="umpan-n" class="umpan-balik"></div>
+      <div id="umpan-n" class="umpan-balik" role="status" aria-live="polite"></div>
       <div class="kuis-alat">
         <button class="tombol halus" id="petunjuk-n">Beri petunjuk</button>
         <button class="tombol halus" id="ulang-n">Tanya dengan cara lain</button>
@@ -1016,33 +1023,7 @@ export function selesaiKuisN(): void {
     const lagi = document.getElementById('lagi-n');
     if (lagi) lagi.addEventListener('click', soalBaruN);
     gambarBeranda();
-  document.addEventListener('keydown', function (e) {
-    const areaKuis = document.getElementById('area-kuis');
-    const areaMirip = document.getElementById('area-kuis-mirip');
-    const aktif = areaKuis && !areaKuis.classList.contains('sembunyi') && areaKuis.innerHTML.trim() !== '';
-    const miripAktif = areaMirip && !areaMirip.classList.contains('sembunyi') && areaMirip.innerHTML.trim() !== '';
-    if (!aktif && !miripAktif) return;
-    if ((e.target as HTMLElement).tagName === 'INPUT') return;
-
-    const tombolJawab = document.querySelectorAll('.tombol-jawab:not(:disabled)') as NodeListOf<HTMLButtonElement>;
-    const tombolLanjut = document.getElementById('tombol-lanjut') || document.getElementById('lanjut-mirip');
-    const tombolPetunjuk = document.getElementById('tombol-petunjuk') || document.getElementById('petunjuk-mirip');
-
-    if (e.key >= '1' && e.key <= '4') {
-      const idx = parseInt(e.key) - 1;
-      if (tombolJawab[idx]) tombolJawab[idx].click();
-    }
-
-    if (e.key === ' ' || e.key === 'Enter') {
-      if (tombolLanjut) { e.preventDefault(); tombolLanjut.click(); }
-    }
-
-    if (e.key.toLowerCase() === 'h') {
-      if (tombolPetunjuk) tombolPetunjuk.click();
-    }
-  });
-
-  gambarRingkasHarian();
+    gambarRingkasHarian();
     return;
   }
 
@@ -1222,6 +1203,26 @@ export function inisialisasiKuisListeners(): void {
       kumpulanKuisKustom(sudah, 'Tes semua ' + nama + ' yang sudah dipelajari');
     });
   }
+
+  document.addEventListener('keydown', function (e) {
+    const areaKuis = document.querySelectorAll('#area-kuis, #area-kuis-mirip, #area-kuis-harian, #area-kuis-kanji, #area-kuis-kosakata, #area-kuis-grammar');
+    const aktif = [...areaKuis].some(area => !area.classList.contains('sembunyi') && area.innerHTML.trim() !== '');
+    if (!aktif) return;
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+
+    const tombolJawab = document.querySelectorAll('.tombol-jawab:not(:disabled)') as NodeListOf<HTMLButtonElement>;
+    const tombolLanjut = document.getElementById('tombol-lanjut') || document.getElementById('lanjut-mirip');
+    const tombolPetunjuk = document.getElementById('tombol-petunjuk') || document.getElementById('petunjuk-mirip');
+
+    if (e.key >= '1' && e.key <= '4') {
+      const idx = Number(e.key) - 1;
+      if (tombolJawab[idx]) tombolJawab[idx].click();
+    } else if (e.key === ' ' || e.key === 'Enter') {
+      if (tombolLanjut) { e.preventDefault(); tombolLanjut.click(); }
+    } else if (e.key.toLowerCase() === 'h') {
+      if (tombolPetunjuk) tombolPetunjuk.click();
+    }
+  });
 
   document.addEventListener('click', function (e) {
     const tombol = (e.target as HTMLElement).closest('[data-aksi="ganti-setelan-kuis"]') as HTMLElement;

@@ -1067,7 +1067,8 @@ export const ATURAN_KHUSUS = [
   }
 ];
 
-export const SEMUA_KANA: KanaItem[] = [...HIRAGANA, ...KATAKANA, ...DAKUTEN, ...HANDAKUTEN, ...YOUON];
+export const SEMUA_KANA: KanaItem[] = [...HIRAGANA, ...KATAKANA, ...DAKUTEN, ...HANDAKUTEN, ...YOUON, ...SERAPAN];
+export const URUTAN_BELAJAR: KanaItem[] = [...HIRAGANA, ...DAKUTEN, ...HANDAKUTEN, ...YOUON, ...KATAKANA, ...SERAPAN];
 
 export const URUTAN_BARIS = [
   { id: 'a', label: 'あ / ア', judul: 'Baris A', huruf: 'あいうえお' },

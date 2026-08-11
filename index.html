@@ -15,17 +15,17 @@
       <span class="brand-teks">Renshuu</span>
     </div>
     <div class="topbar-kanan">
-      <button class="tombol-toggle-gelap" id="toggle-gelap" aria-label="Mode gelap">
+      <button class="tombol-toggle-gelap" id="toggle-gelap" type="button" aria-label="Mode gelap" aria-pressed="false">
         <span class="ikon-terang">&#9788;</span>
         <span class="ikon-gelap">&#9790;</span>
       </button>
     </div>
-    <button class="nav-hamburger" id="nav-hamburger" aria-label="Buka menu">☰</button>
-    <nav class="nav" id="nav">
+    <button class="nav-hamburger" id="nav-hamburger" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="nav">☰</button>
+    <nav class="nav" id="nav" aria-label="Navigasi utama">
       <button class="nav-btn aktif" data-halaman="beranda">Beranda</button>
       <div class="nav-grup">
-        <button class="nav-btn nav-grup-induk">Belajar ▾</button>
-        <div class="nav-submenu">
+        <button class="nav-btn nav-grup-induk" type="button" aria-expanded="false" aria-controls="submenu-belajar">Belajar ▾</button>
+        <div class="nav-submenu" id="submenu-belajar">
           <button class="nav-btn" data-halaman="belajar">Huruf</button>
           <button class="nav-btn" data-halaman="konsep">Konsep</button>
           <button class="nav-btn" data-halaman="kanji">Kanji</button>
@@ -34,16 +34,16 @@
         </div>
       </div>
       <div class="nav-grup">
-        <button class="nav-btn nav-grup-induk">Latihan ▾</button>
-        <div class="nav-submenu">
+        <button class="nav-btn nav-grup-induk" type="button" aria-expanded="false" aria-controls="submenu-latihan">Latihan ▾</button>
+        <div class="nav-submenu" id="submenu-latihan">
           <button class="nav-btn" data-halaman="latihan">Latihan</button>
           <button class="nav-btn" data-halaman="baca">Baca Kata</button>
           <button class="nav-btn" data-halaman="mirip">Huruf Mirip</button>
         </div>
       </div>
       <div class="nav-grup">
-        <button class="nav-btn nav-grup-induk">Panduan ▾</button>
-        <div class="nav-submenu">
+        <button class="nav-btn nav-grup-induk" type="button" aria-expanded="false" aria-controls="submenu-panduan">Panduan ▾</button>
+        <div class="nav-submenu" id="submenu-panduan">
           <button class="nav-btn" data-halaman="aturan">Aturan</button>
           <button class="nav-btn" data-halaman="peta">Peta Jalan</button>
         </div>
@@ -69,12 +69,12 @@
 
     <div class="kartu-baris" id="ringkas-beranda"></div>
 
-    <div class="panel">
+    <div class="panel panel-hari-ini">
       <h2>Hari ini</h2>
       <div id="tugas-hari-ini"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel panel-ulangan">
       <h2>Ulangan harian</h2>
       <p class="petunjuk">
         Semua kanji, kosakata, dan grammar yang jatuh tempo hari ini,
@@ -180,8 +180,9 @@
           <button class="pil" data-materi="katakana">Katakana</button>
           <button class="pil" data-materi="campuran">Campuran keduanya</button>
           <button class="pil" data-materi="dakuten">Dakuten &amp; Handakuten</button>
-          <button class="pil" data-materi="youon">Youon</button>
-          <button class="pil" data-materi="semua">Semua huruf</button>
+      <button class="pil" data-materi="youon">Youon</button>
+      <button class="pil" data-materi="serapan">Bunyi serapan</button>
+      <button class="pil" data-materi="semua">Semua huruf</button>
           <button class="pil" data-materi="jatuhtempo">Yang jatuh tempo hari ini</button>
           <button class="pil" data-materi="dipelajari">Yang sudah kupelajari</button>
         </div>
@@ -201,7 +202,7 @@
       <button class="tombol utama besar-penuh" id="mulai-latihan">Mulai latihan</button>
     </div>
 
-    <div id="area-kuis" class="sembunyi"></div>
+      <div id="area-kuis" class="sembunyi" aria-live="polite"></div>
   </section>
 
   <!-- ============ HURUF MIRIP ============ -->
@@ -339,8 +340,9 @@
     <div class="panel">
       <h2>Pulihkan dari file</h2>
       <p>Pilih file cadangan yang pernah kamu unduh. Progres sekarang akan ditimpa.</p>
+      <label for="input-import">File cadangan JSON</label>
       <input type="file" id="input-import" accept=".json">
-      <div id="pesan-import"></div>
+      <div id="pesan-import" role="status" aria-live="polite"></div>
     </div>
 
     <div class="panel bahaya">
@@ -449,7 +451,7 @@
   </p>
 </footer>
 
-<div id="overlay-tulis" class="overlay-tulis sembunyi">
+<div id="overlay-tulis" class="overlay-tulis sembunyi" role="dialog" aria-modal="true" aria-labelledby="tulis-kana">
   <div class="overlay-panel">
     <div class="overlay-kepala">
       <div class="overlay-judul">

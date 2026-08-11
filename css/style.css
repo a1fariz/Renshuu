@@ -73,6 +73,9 @@ body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .brand {
@@ -99,31 +102,28 @@ body {
   margin-left: auto;
   display: flex;
   align-items: center;
+  order: 2;
 }
 
 .tombol-toggle-gelap {
   background: var(--latar-lembut);
   border: 1px solid var(--garis);
-  border-radius: 20px;
-  width: 40px;
-  height: 22px;
+  border-radius: 22px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
   position: relative;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.tombol-toggle-gelap .ikon-terang {
-  position: absolute;
-  left: 3px;
-  top: 2px;
-  font-size: 14px;
-}
-
+.tombol-toggle-gelap .ikon-terang,
 .tombol-toggle-gelap .ikon-gelap {
-  position: absolute;
-  right: 3px;
-  top: 2px;
   font-size: 14px;
+  line-height: 1;
 }
 
 [data-theme="gelap"] .tombol-toggle-gelap {
@@ -133,8 +133,10 @@ body {
 
 .nav {
   display: flex;
+  flex-basis: 100%;
   gap: 2px;
   padding-bottom: 2px;
+  order: 4;
 }
 
 .nav-btn {
@@ -256,11 +258,43 @@ h3 {
 
 .panel.bahaya { border-color: #e8c4bf; background: #fffbfa; }
 
+.panel-hari-ini {
+  border-color: color-mix(in srgb, var(--aksen) 32%, var(--garis));
+  box-shadow: 0 8px 24px rgba(176, 74, 63, 0.08);
+}
+
+.panel-hari-ini > h2,
+.panel-ulangan > h2 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.panel-hari-ini > h2::before {
+  content: '●';
+  color: var(--aksen);
+  font-size: 12px;
+}
+
+.panel-ulangan > h2::before {
+  content: '↻';
+  color: var(--dikuasai);
+  font-size: 20px;
+  line-height: 1;
+}
+
 .sembunyi { display: none !important; }
 .tersembunyi { visibility: hidden; opacity: 0; }
 
 /* ---------------- SAMBUTAN ---------------- */
-.sambutan { margin-bottom: 24px; }
+.sambutan {
+  margin-bottom: 24px;
+  padding: 28px 30px;
+  border: 1px solid var(--garis);
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--latar-panel), var(--aksen-lembut));
+  box-shadow: var(--bayang);
+}
 
 .sambutan h1 {
   font-family: var(--font-jp);
@@ -291,6 +325,13 @@ h3 {
 
 .tombol:hover { background: var(--latar-lembut); border-color: #cdc6bd; }
 .tombol:active { transform: translateY(1px); }
+
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--aksen);
+  outline-offset: 3px;
+}
 
 .tombol.utama {
   background: var(--aksen);
@@ -374,8 +415,15 @@ h3 {
   background: var(--latar-panel);
   border: 1px solid var(--garis);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 17px;
   box-shadow: var(--bayang);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.kartu-ringkas:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--aksen) 45%, var(--garis));
+  box-shadow: 0 8px 22px rgba(44, 40, 37, 0.09);
 }
 
 .bar-status {
@@ -444,8 +492,8 @@ h3 {
 
 .tugas:last-of-type { border-bottom: none; }
 
-.tugas-teks { display: flex; flex-direction: column; gap: 2px; }
-.tugas-teks strong { font-size: 15px; font-weight: 620; }
+.tugas-teks { display: flex; flex-direction: column; gap: 3px; }
+.tugas-teks strong { font-size: 15.5px; font-weight: 650; }
 .tugas-teks span { font-size: 13.5px; color: var(--teks-lembut); }
 .tugas.selesai .tugas-teks strong { color: var(--dikuasai); }
 
@@ -578,9 +626,9 @@ h3 {
   font-size: 17px;
   color: var(--teks-lembut);
   background: var(--latar-lembut);
-  border: none;
+  border: 1px solid var(--garis);
   border-radius: 50%;
-  width: 34px; height: 34px;
+  width: 40px; height: 40px;
   cursor: pointer;
   flex-shrink: 0;
   transition: all 0.15s;
@@ -1634,6 +1682,8 @@ h3 {
   .daftar-langkah li { flex-direction: column; gap: 10px; }
   .daftar-langkah li .tombol { align-self: flex-start; }
 
+  .sambutan { padding: 22px 18px; }
+  .topbar-inner { padding: 0 14px; }
   .tombol { padding: 12px 18px; min-height: 44px; }
   .tombol.utama { padding: 13px 22px; }
   .tombol.selesai { padding: 13px 22px; }

@@ -194,6 +194,8 @@ export function bukaTulis(kana: string, romaji: string, coretan?: string): void 
   state.aktif = true;
   overlay.classList.remove('sembunyi');
   document.body.style.overflow = 'hidden';
+  const tombolTutup = document.getElementById('tulis-tutup');
+  if (tombolTutup) tombolTutup.focus();
 
   const labelKana = document.getElementById('tulis-kana');
   const labelRomaji = document.getElementById('tulis-romaji');
