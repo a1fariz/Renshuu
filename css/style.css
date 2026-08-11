@@ -283,9 +283,10 @@ h3 {
   background: var(--latar-panel);
   border: 1px solid var(--garis);
   border-radius: 8px;
-  padding: 9px 16px;
+  padding: 10px 18px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  line-height: 1.4;
 }
 
 .tombol:hover { background: var(--latar-lembut); border-color: #cdc6bd; }
@@ -295,6 +296,8 @@ h3 {
   background: var(--aksen);
   border-color: var(--aksen);
   color: #fff;
+  padding: 11px 22px;
+  font-size: 15px;
 }
 
 .tombol.utama:hover { background: var(--aksen-gelap); border-color: var(--aksen-gelap); }
@@ -303,7 +306,8 @@ h3 {
   background: none;
   border-color: transparent;
   color: var(--teks-lembut);
-  padding: 8px 12px;
+  padding: 8px 14px;
+  font-size: 13.5px;
 }
 
 .tombol.halus:hover { background: var(--latar-lembut); color: var(--teks); }
@@ -312,6 +316,8 @@ h3 {
   background: var(--dikuasai);
   border-color: var(--dikuasai);
   color: #fff;
+  padding: 11px 22px;
+  font-size: 15px;
 }
 
 .tombol.selesai:hover { filter: brightness(0.93); }
@@ -326,22 +332,29 @@ h3 {
 
 .tombol.besar-penuh {
   width: 100%;
-  padding: 13px;
+  padding: 14px;
   font-size: 15px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .tombol.besar {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 3px;
+  gap: 4px;
   text-align: left;
-  padding: 15px 18px;
+  padding: 16px 20px;
 }
 
 .tombol.besar strong { font-size: 15px; font-weight: 620; }
 .tombol.besar span { font-size: 13px; color: var(--teks-lembut); font-weight: 400; }
+
+.tombol.kecil {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  line-height: 1.3;
+}
 
 .pintasan {
   display: grid;
@@ -451,8 +464,8 @@ h3 {
 .pilih-sistem {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 16px;
 }
 
 .pil {
@@ -462,7 +475,7 @@ h3 {
   background: var(--latar-panel);
   border: 1px solid var(--garis);
   border-radius: 20px;
-  padding: 7px 15px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -479,7 +492,7 @@ h3 {
 .pilih-baris {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 8px;
   margin-bottom: 18px;
 }
 
@@ -754,10 +767,10 @@ h3 {
 .kuis-alat {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
-  margin-top: 26px;
-  padding-top: 18px;
+  margin-top: 24px;
+  padding-top: 20px;
   border-top: 1px solid var(--garis);
 }
 
@@ -1191,12 +1204,6 @@ h3 {
   margin-bottom: 10px;
 }
 
-.tombol.kecil {
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 7px;
-}
-
 .konsep-detail {
   margin-top: 12px;
   padding: 12px 0 0;
@@ -1292,9 +1299,9 @@ h3 {
 /* ---------------- KARTU KANA: AKSI & DETAIL ---------------- */
 .kartu-aksi {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin: 10px 0 6px;
+  margin: 12px 0 8px;
 }
 
 .details-panah > summary::-webkit-details-marker { display: none; }
@@ -1359,11 +1366,11 @@ h3 {
 .target-list li {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   background: var(--latar-panel);
   border: 1px solid var(--garis);
   border-radius: 8px;
-  padding: 6px 10px;
+  padding: 8px 12px;
 }
 
 .target-list li.selesai {
@@ -1627,6 +1634,20 @@ h3 {
   .daftar-langkah li { flex-direction: column; gap: 10px; }
   .daftar-langkah li .tombol { align-self: flex-start; }
 
+  .tombol { padding: 12px 18px; min-height: 44px; }
+  .tombol.utama { padding: 13px 22px; }
+  .tombol.selesai { padding: 13px 22px; }
+  .tombol.halus { min-height: auto; padding: 10px 14px; }
+  .tombol.jawab { min-height: 48px; }
+  .pil { padding: 9px 16px; min-height: 40px; }
+  .pil-baris { padding: 9px 14px; min-height: 40px; }
+  .tombol-jawab { padding: 16px 14px; min-height: 52px; }
+  .kana-pilihan { padding: 18px 14px; min-height: 60px; }
+
+  .kartu-aksi { gap: 8px; }
+  .target-list li { padding: 10px 14px; }
+  .kuis-alat { gap: 10px; }
+
   .nav-hamburger { display: block; margin: 0 0 8px auto; }
   .nav {
     display: none;
@@ -1641,7 +1662,7 @@ h3 {
     margin-top: 4px;
   }
   .nav.terbuka { display: flex; }
-  .nav-btn { text-align: left; border-bottom: none; padding: 10px 16px; }
+  .nav-btn { text-align: left; border-bottom: none; padding: 12px 16px; }
   .nav-grup { width: 100%; }
   .nav-grup-induk { width: 100%; text-align: left; font-weight: 600; }
   .nav-submenu {
@@ -1654,10 +1675,15 @@ h3 {
   }
   .nav-grup:hover .nav-submenu { display: none; }
   .nav-grup.terbuka .nav-submenu { display: block; }
-  .nav-submenu .nav-btn { padding: 8px 16px; }
+  .nav-submenu .nav-btn { padding: 10px 16px; min-height: 44px; }
 
-  .overlay-panel { padding: 14px; }
+  .overlay-panel { padding: 16px; }
   .tulis-panduan { font-size: 150px; }
   .stroke-svg { max-height: 220px; }
+  .kartu-kana { padding: 14px; }
+  .panel { padding: 16px; }
+  .streak-panel { padding: 14px; }
+  .streak-angka strong { font-size: 24px; }
+  .hari-kal { width: 28px; height: 28px; }
 }
 
