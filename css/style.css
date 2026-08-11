@@ -1523,13 +1523,15 @@ summary:focus-visible {
 .tulis-panduan {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-jp);
   font-size: 200px;
-  color: rgba(44, 40, 37, 0.09);
+  line-height: 1;
+  color: rgba(176, 74, 63, 0.28);
+  text-shadow: 0 0 1px rgba(176, 74, 63, 0.18);
   pointer-events: none;
   user-select: none;
 }
@@ -1665,6 +1667,7 @@ summary:focus-visible {
 [data-theme="gelap"] .fase-ujian .fase-label { background: #1a3020; color: #6aad7a; }
 [data-theme="gelap"] .kanvas-bungkus { background: #2e2e2e; }
 [data-theme="gelap"] .kanvas-bungkus::before { opacity: 0.5; }
+[data-theme="gelap"] .tulis-panduan { color: rgba(255, 180, 170, 0.42); text-shadow: 0 0 1px rgba(255, 180, 170, 0.25); }
 [data-theme="gelap"] .target-list li { background: var(--latar-panel); border-color: var(--garis); }
 [data-theme="gelap"] .target-list li.selesai { background: #1a3020; border-color: var(--dikuasai); }
 [data-theme="gelap"] .hari-kal { background: var(--latar-panel); color: var(--teks-lembut); }

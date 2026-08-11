@@ -9,7 +9,12 @@ import {
 } from './ui/app';
 import { inisialisasiKuisListeners } from './ui/kuis';
 
+let sudahDiinisialisasi = false;
+
 document.addEventListener('DOMContentLoaded', () => {
+  if (sudahDiinisialisasi) return;
+  sudahDiinisialisasi = true;
+
   inisialisasiSuara();
   inisialisasiCanvasTulis();
   inisialisasiAppListeners();
