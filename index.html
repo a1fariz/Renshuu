@@ -14,19 +14,42 @@
       <span class="brand-kana">練</span>
       <span class="brand-teks">Renshuu</span>
     </div>
+    <div class="topbar-kanan">
+      <button class="tombol-toggle-gelap" id="toggle-gelap" aria-label="Mode gelap">
+        <span class="ikon-terang">&#9788;</span>
+        <span class="ikon-gelap">&#9790;</span>
+      </button>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Buka menu">☰</button>
     <nav class="nav" id="nav">
       <button class="nav-btn aktif" data-halaman="beranda">Beranda</button>
-      <button class="nav-btn" data-halaman="belajar">Huruf</button>
-      <button class="nav-btn" data-halaman="latihan">Latihan</button>
-      <button class="nav-btn" data-halaman="mirip">Huruf Mirip</button>
-      <button class="nav-btn" data-halaman="baca">Baca Kata</button>
-      <button class="nav-btn" data-halaman="kanji">Kanji</button>
-      <button class="nav-btn" data-halaman="kosakata">Kosakata</button>
-      <button class="nav-btn" data-halaman="grammar">Grammar</button>
-      <button class="nav-btn" data-halaman="aturan">Aturan</button>
-      <button class="nav-btn" data-halaman="peta">Peta Jalan</button>
+      <div class="nav-grup">
+        <button class="nav-btn nav-grup-induk">Belajar ▾</button>
+        <div class="nav-submenu">
+          <button class="nav-btn" data-halaman="belajar">Huruf</button>
+          <button class="nav-btn" data-halaman="konsep">Konsep</button>
+          <button class="nav-btn" data-halaman="kanji">Kanji</button>
+          <button class="nav-btn" data-halaman="kosakata">Kosakata</button>
+          <button class="nav-btn" data-halaman="grammar">Grammar</button>
+        </div>
+      </div>
+      <div class="nav-grup">
+        <button class="nav-btn nav-grup-induk">Latihan ▾</button>
+        <div class="nav-submenu">
+          <button class="nav-btn" data-halaman="latihan">Latihan</button>
+          <button class="nav-btn" data-halaman="baca">Baca Kata</button>
+          <button class="nav-btn" data-halaman="mirip">Huruf Mirip</button>
+        </div>
+      </div>
+      <div class="nav-grup">
+        <button class="nav-btn nav-grup-induk">Panduan ▾</button>
+        <div class="nav-submenu">
+          <button class="nav-btn" data-halaman="aturan">Aturan</button>
+          <button class="nav-btn" data-halaman="peta">Peta Jalan</button>
+        </div>
+      </div>
       <button class="nav-btn" data-halaman="cadangan">Cadangan</button>
-      <button class="nav-btn" data-halaman="sumber">Sumber &amp; Lisensi</button>
+      <button class="nav-btn" data-halaman="sumber">Sumber</button>
     </nav>
   </div>
 </header>
@@ -62,11 +85,20 @@
     </div>
 
     <div class="panel">
-      <h2>Mulai dari mana?</h2>
+      <h2>Langkahmu berikutnya</h2>
+      <div id="panduan-langkah"></div>
+    </div>
+
+    <div class="panel" id="panel-pintasan">
+      <h2>Pintasan</h2>
       <div class="pintasan">
         <button class="tombol besar" data-pintasan="belajar-a">
           <strong>Belum pernah belajar kana</strong>
           <span>Mulai dari baris あ (a i u e o)</span>
+        </button>
+        <button class="tombol besar" data-pintasan="konsep">
+          <strong>Masih bingung hiragana vs katakana?</strong>
+          <span>Baca penjelasan singkatnya dulu</span>
         </button>
         <button class="tombol besar" data-pintasan="latihan">
           <strong>Sudah kenal beberapa huruf</strong>
@@ -80,6 +112,17 @@
     </div>
   </section>
 
+  <!-- ============ KONSEP DASAR ============ -->
+  <section class="halaman" id="halaman-konsep">
+    <h1>Konsep Dasar</h1>
+    <p class="petunjuk">
+      Sebelum menghafal huruf, pahami dulu apa yang sedang kamu pelajari.
+      Bagian ini menjelaskan kenapa bahasa Jepang punya dua jenis huruf bunyi
+      dan bagaimana cara paling efektif memakai aplikasi ini.
+    </p>
+    <div id="daftar-konsep"></div>
+  </section>
+
   <!-- ============ BELAJAR HURUF ============ -->
   <section class="halaman" id="halaman-belajar">
     <h1>Belajar Huruf</h1>
@@ -88,6 +131,14 @@
       tulis ulang di kertas sambil mengikuti urutan coretan, lalu ucapkan
       contoh katanya dengan suara. Itu yang membuatnya menempel.
     </p>
+
+    <div class="panel konsep-lipat">
+      <button class="konsep-toggle" id="toggle-konsep-belajar" aria-expanded="false">
+        <span class="toggle-ikon">+</span>
+        <span id="konsep-judul-belajar">Apa itu hiragana?</span>
+      </button>
+      <div class="konsep-isi sembunyi" id="isi-konsep-belajar"></div>
+    </div>
 
     <div class="pilih-sistem" id="pilih-sistem">
       <button class="pil aktif" data-sistem="hiragana">Hiragana</button>
@@ -99,6 +150,15 @@
 
     <div class="pilih-baris" id="pilih-baris"></div>
     <div class="grid-kana" id="grid-kana"></div>
+
+    <div class="panel area-tes-baris sembunyi" id="area-tes-baris">
+      <h2>Uji ingatan</h2>
+      <p id="label-tes-baris">Cek apakah baris ini sudah menempel sebelum lanjut ke baris berikutnya.</p>
+      <div class="kuis-alat kiri">
+        <button class="tombol utama" id="tes-baris-ini">Tes baris ini</button>
+        <button class="tombol" id="tes-semua-dipelajari">Tes semua yang sudah kupelajari</button>
+      </div>
+    </div>
   </section>
 
   <!-- ============ LATIHAN (SRS + KUIS) ============ -->
@@ -107,8 +167,10 @@
 
     <div id="setelan-latihan">
       <p class="petunjuk">
-        Pilih apa yang mau dilatih. Kuis berhenti kalau kamu menekan
-        &ldquo;Sudah paham&rdquo;. Tidak ada batas soal, tidak ada nilai akhir.
+        Pilih apa yang mau dilatih. Untuk mengecek ingatan secara menyeluruh,
+        pilih "Yang sudah kupelajari" — aplikasi akan mencampur semua huruf
+        yang pernah kamu sentuh, dari awal sampai sekarang. Kuis berhenti
+        kalau kamu menekan &ldquo;Sudah paham&rdquo;.
       </p>
 
       <div class="panel">
@@ -121,6 +183,7 @@
           <button class="pil" data-materi="youon">Youon</button>
           <button class="pil" data-materi="semua">Semua huruf</button>
           <button class="pil" data-materi="jatuhtempo">Yang jatuh tempo hari ini</button>
+          <button class="pil" data-materi="dipelajari">Yang sudah kupelajari</button>
         </div>
       </div>
 
@@ -131,6 +194,7 @@
           <button class="pil" data-jenis="huruf-bunyi">Huruf &rarr; bunyi</button>
           <button class="pil" data-jenis="bunyi-huruf">Bunyi &rarr; huruf</button>
           <button class="pil" data-jenis="ketik">Ketik bacaannya</button>
+          <button class="pil" data-jenis="mendengar">Dengar &rarr; bunyi</button>
         </div>
       </div>
 
@@ -166,7 +230,9 @@
       <div class="pilih-sistem" id="pilih-tingkat-baca">
         <button class="pil aktif" data-tingkat="hiragana">Hiragana saja</button>
         <button class="pil" data-tingkat="katakana">Katakana saja</button>
-        <button class="pil" data-tingkat="campuran">Campuran</button>
+        <button class="pil" data-tingkat="campuran">Kata campuran</button>
+        <button class="pil" data-tingkat="kalimat-hiragana">Kalimat hiragana</button>
+        <button class="pil" data-tingkat="kalimat-campuran">Kalimat campuran</button>
       </div>
       <button class="tombol utama besar-penuh" id="mulai-baca">Mulai membaca</button>
     </div>
@@ -382,6 +448,41 @@
     Mengacu pada <button class="link-btn" data-pintasan="buka-sumber">Sumber Rujukan &amp; Lisensi Open-Source (CC BY-SA 4.0)</button>.
   </p>
 </footer>
+
+<div id="overlay-tulis" class="overlay-tulis sembunyi">
+  <div class="overlay-panel">
+    <div class="overlay-kepala">
+      <div class="overlay-judul">
+        <span class="kana-besar" id="tulis-kana">あ</span>
+        <span class="romaji" id="tulis-romaji">a</span>
+      </div>
+      <button class="tombol-suara" id="tulis-dengar" title="Dengarkan">&#9834;</button>
+      <button class="tombol" id="tulis-tutup" aria-label="Tutup">×</button>
+    </div>
+    <p class="coretan sembunyi" id="tulis-coretan"></p>
+
+    <div class="tulis-tab">
+      <button class="pil aktif" data-tab-tulis="tonton">Tonton urutan</button>
+      <button class="pil" data-tab-tulis="tulis">Tulis sendiri</button>
+    </div>
+
+    <div class="kanvas-bungkus" id="tulis-tonton">
+      <svg id="stroke-svg" class="stroke-svg" viewBox="0 0 109 109" preserveAspectRatio="xMidYMid meet"></svg>
+      <span class="stroke-status" id="stroke-status"></span>
+      <button class="tombol halus kecil stroke-ulang" id="stroke-ulang">Ulangi animasi</button>
+    </div>
+
+    <div class="kanvas-bungkus sembunyi" id="tulis-tulis">
+      <canvas id="kanvas-tulis" width="600" height="320"></canvas>
+      <span class="tulis-panduan" id="tulis-panduan">あ</span>
+    </div>
+
+    <div class="kuis-alat kiri">
+      <button class="tombol halus" id="tulis-mode">Mode: panduan</button>
+      <button class="tombol halus" id="tulis-hapus">Bersihkan</button>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="/src/main.ts"></script>
 </body>

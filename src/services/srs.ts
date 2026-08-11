@@ -3,6 +3,7 @@ import type { KartuSRS, ProgresSRS, StatusKartu, HasilRingkasan } from '../types
 export const KUNCI_SIMPANAN = 'belajar-jepang-progres';
 export const JADWAL_HARI = [0, 1, 2, 4, 7, 14, 30, 60];
 export const TAHAP_DIKUASAI = 5;
+export const TAHAP_HAMPIR = 3;
 
 export function hariIni(): string {
   const d = new Date();
@@ -48,6 +49,7 @@ export function perbaruiKartu(kartu: KartuSRS, lancar: boolean): KartuSRS {
 export function statusKartu(kartu?: KartuSRS): StatusKartu {
   if (!kartu || kartu.kaliDilihat === 0) return 'belum';
   if (kartu.tahap >= TAHAP_DIKUASAI) return 'dikuasai';
+  if (kartu.tahap >= TAHAP_HAMPIR) return 'hampir';
   return 'dilatih';
 }
 
@@ -55,6 +57,7 @@ export function labelStatus(status: StatusKartu | string): string {
   const label: Record<string, string> = {
     belum: 'Belum disentuh',
     dilatih: 'Masih dilatih',
+    hampir: 'Hampir hafal',
     dikuasai: 'Sudah dikuasai',
   };
   return label[status] || 'Belum disentuh';
@@ -114,7 +117,7 @@ export function kartuJatuhTempo(progres: ProgresSRS, daftarId: string[]): string
 }
 
 export function ringkasProgres(progres: ProgresSRS, daftarId: string[]): HasilRingkasan {
-  const hasil: HasilRingkasan = { belum: 0, dilatih: 0, dikuasai: 0 };
+  const hasil: HasilRingkasan = { belum: 0, dilatih: 0, hampir: 0, dikuasai: 0 };
   daftarId.forEach(id => {
     const st = statusKartu(progres.kartu[id]);
     hasil[st] += 1;
@@ -193,4 +196,32 @@ export function ambilAcak<T>(array: T[], jumlah: number): T[] {
 
 export function satuAcak<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
+}
+
+export function hitungStreak(progres: ProgresSRS): { streak: number; hariAktif: Set<string> } {
+  const hariSet = new Set<string>();
+  Object.values(progres.kartu).forEach(k => {
+    if (k.terakhirDilihat) hariSet.add(k.terakhirDilihat);
+  });
+
+  const hariAktif = new Set(hariSet);
+  let streak = 0;
+  let tanggal = new Date();
+
+  while (true) {
+    const tgl = `${tanggal.getFullYear()}-${String(tanggal.getMonth() + 1).padStart(2, '0')}-${String(tanggal.getDate()).padStart(2, '0')}`;
+    if (hariSet.has(tgl)) {
+      streak++;
+      tanggal.setDate(tanggal.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return { streak, hariAktif };
+}
+
+export function formatHari(tgl: string): string {
+  const [, m, d] = tgl.split('-').map(Number);
+  return `${d}/${m}`;
 }

@@ -2,13 +2,14 @@ import {
   HIRAGANA, KATAKANA, DAKUTEN, HANDAKUTEN, YOUON, SEMUA_KANA, HURUF_MIRIP
 } from '../data/kana';
 import { KATA_HIRAGANA, KATA_KATAKANA, KATA_CAMPURAN } from '../data/kata';
+import { KALIMAT_HIRAGANA, KALIMAT_CAMPURAN } from '../data/kalimat';
 import { SEMUA_KANJI } from '../data/kanji';
 import { SEMUA_KOSAKATA } from '../data/kosakata';
 import { SEMUA_GRAMMAR } from '../data/grammar';
 import {
   PROGRES, kanjiTampil, kosakataTampil, grammarTampil,
   gambarBeranda, gambarGridKana, gambarGridKanji, gambarDaftarKosakata, gambarDaftarGrammar,
-  pilihPil
+  pilihPil, bukaHalaman, sistemAktif, barisAktif, daftarSistem
 } from './app';
 import {
   ambilKartu, perbaruiKartu, simpanProgres, kartuJatuhTempo, ringkasProgres,
@@ -19,13 +20,15 @@ import type { KanaItem, KanjiItem, KosakataItem, GrammarBelajar } from '../types
 
 export let materiKuis = 'hiragana';
 export let jenisKuis = 'acak';
+export let labelKuis = 'Hiragana';
+export let materiKustom: KanaItem[] = [];
 
 export let soalSekarang: KanaItem | null = null;
 export let jenisSoalSekarang: string | null = null;
 export let tingkatPetunjuk = 0;
 export let sudahDijawab = false;
 
-export const JENIS_TERSEDIA = ['huruf-bunyi', 'bunyi-huruf', 'ketik'];
+export const JENIS_TERSEDIA = ['huruf-bunyi', 'bunyi-huruf', 'ketik', 'mendengar'];
 
 export function kumpulanKuis(): KanaItem[] {
   if (materiKuis === 'hiragana') return HIRAGANA;
@@ -42,7 +45,31 @@ export function kumpulanKuis(): KanaItem[] {
     return hasil.length > 0 ? hasil : HIRAGANA;
   }
 
+  if (materiKuis === 'dipelajari') {
+    const hasil = SEMUA_KANA.filter(k => {
+      const kartu = PROGRES.kartu[k.tipe + '-' + k.kana];
+      return kartu && kartu.kaliDilihat > 0;
+    });
+    return hasil.length > 0 ? hasil : HIRAGANA;
+  }
+
+  if (materiKuis === 'kustom') {
+    return materiKustom.length > 0 ? materiKustom : HIRAGANA;
+  }
+
   return HIRAGANA;
+}
+
+export function kumpulanKuisKustom(daftar: KanaItem[], label: string): void {
+  materiKustom = daftar;
+  materiKuis = 'kustom';
+  labelKuis = label;
+  riwayatSingkat = [];
+  document.querySelectorAll('#pilih-materi .pil').forEach(p => p.classList.remove('aktif'));
+  bukaHalaman('latihan');
+  const setelan = document.getElementById('setelan-latihan');
+  if (setelan) setelan.classList.add('sembunyi');
+  soalBaru('area-kuis');
 }
 
 export const VARIASI_ROMAJI: Record<string, string[]> = {
@@ -76,6 +103,7 @@ export let riwayatSingkat: string[] = [];
 export function pilihSoal(): KanaItem {
   const kumpulan = kumpulanKuis();
   const belumLamaIni = (x: KanaItem) => !riwayatSingkat.includes(x.tipe + '-' + x.kana);
+  const cumaUlangan = materiKuis === 'dipelajari' || materiKuis === 'kustom';
 
   const jatuhTempo = kumpulan.filter(k => {
     const kartu = PROGRES.kartu[k.tipe + '-' + k.kana];
@@ -87,7 +115,7 @@ export function pilihSoal(): KanaItem {
   let terpilih: KanaItem;
 
   const jatuhTempoSegar = jatuhTempo.filter(belumLamaIni);
-  const belumSegar = belum.filter(belumLamaIni);
+  const belumSegar = cumaUlangan ? [] : belum.filter(belumLamaIni);
 
   if (jatuhTempoSegar.length > 0 && Math.random() < 0.6) {
     terpilih = satuAcak(jatuhTempoSegar);
@@ -216,6 +244,27 @@ export function gambarSoal(idArea: string): void {
         ${pilihan.map(p => `<button class="tombol-jawab kana-pilihan" data-jawab="${p}">${p}</button>`).join('')}
       </div>`;
 
+  } else if (jenis === 'mendengar') {
+    const bunyiBenar = romajiUtama(k.romaji);
+    let pengecoh = [...new Set(
+      kumpulanKuis().map(x => romajiUtama(x.romaji)).filter(r => r !== bunyiBenar)
+    )];
+    if (pengecoh.length < 3) {
+      const cadangan = [...new Set(
+        SEMUA_KANA.map(x => romajiUtama(x.romaji)).filter(r => r !== bunyiBenar)
+      )];
+      pengecoh = [...new Set([...pengecoh, ...cadangan])];
+    }
+    const pilihan = acak([bunyiBenar, ...ambilAcak(pengecoh, 3)]);
+    isiSoal = `
+      <p class="soal-perintah">Dengar bunyinya, lalu pilih cara bacanya</p>
+      <div class="soal-kana">
+        <button class="tombol utama besar-penuh" id="tombol-dengar-kuis" style="margin:0 auto;max-width:220px;display:block">&#9835; Putar sekarang</button>
+      </div>
+      <div class="pilihan-jawab">
+        ${pilihan.map(p => `<button class="tombol-jawab" data-jawab="${p}">${p}</button>`).join('')}
+      </div>`;
+
   } else {
     isiSoal = `
       <p class="soal-perintah">Ketik cara baca huruf ini</p>
@@ -231,6 +280,7 @@ export function gambarSoal(idArea: string): void {
 
   area.innerHTML = `
     <div class="panel kuis">
+      ${materiKuis === 'dipelajari' || materiKuis === 'kustom' ? `<p class="konteks-kuis">${labelKuis}</p>` : ''}
       ${isiSoal}
       <div id="umpan-balik" class="umpan-balik"></div>
       <div class="kuis-alat">
@@ -242,6 +292,14 @@ export function gambarSoal(idArea: string): void {
     </div>`;
 
   area.classList.remove('sembunyi');
+
+  if (jenisSoalSekarang === 'mendengar') {
+    setTimeout(() => ucapkan(k.kana), 200);
+    const tombolDengar = document.getElementById('tombol-dengar-kuis');
+    if (tombolDengar) {
+      tombolDengar.addEventListener('click', () => ucapkan(k.kana));
+    }
+  }
 
   const input = document.getElementById('input-jawab') as HTMLInputElement;
   if (input) {
@@ -418,32 +476,22 @@ export function selesaiKuis(idArea: string): void {
       <p>Keadaan materi yang tadi kamu latih:</p>
       <ul class="rincian-status besar">
         <li><span class="titik dikuasai"></span> Sudah dikuasai: ${r.dikuasai} huruf</li>
+        <li><span class="titik hampir"></span> Hampir hafal: ${r.hampir} huruf</li>
         <li><span class="titik dilatih"></span> Masih dilatih: ${r.dilatih} huruf</li>
         <li><span class="titik belum"></span> Belum disentuh: ${r.belum} huruf</li>
       </ul>
       <p class="catatan-kecil">
         Yang masih dilatih akan muncul lagi sendiri di hari yang tepat.
-        Tidak perlu kamu ingat-ingat.
       </p>
       <div class="kuis-alat">
         <button class="tombol utama" id="lanjut-lagi">Latihan lagi</button>
-        <button class="tombol" id="ganti-setelan">Ganti materi</button>
+        <button class="tombol" data-aksi="ganti-setelan-kuis">Ganti materi</button>
         <button class="tombol" data-pintasan="belajar">Pelajari huruf baru</button>
       </div>
     </div>`;
 
   const lanjutLagi = document.getElementById('lanjut-lagi');
   if (lanjutLagi) lanjutLagi.addEventListener('click', () => soalBaru(idArea));
-
-  const gantiSetelan = document.getElementById('ganti-setelan');
-  if (gantiSetelan) {
-    gantiSetelan.addEventListener('click', function () {
-      area.classList.add('sembunyi');
-      area.innerHTML = '';
-      const setelan = document.getElementById('setelan-latihan');
-      if (setelan) setelan.classList.remove('sembunyi');
-    });
-  }
 
   gambarBeranda();
   gambarGridKana();
@@ -536,6 +584,8 @@ export let kataSekarang: { kata: string; baca: string; arti: string } | null = n
 export function kumpulanKata() {
   if (tingkatBaca === 'hiragana') return KATA_HIRAGANA;
   if (tingkatBaca === 'katakana') return KATA_KATAKANA;
+  if (tingkatBaca === 'kalimat-hiragana') return KALIMAT_HIRAGANA;
+  if (tingkatBaca === 'kalimat-campuran') return KALIMAT_CAMPURAN;
   return [...KATA_HIRAGANA, ...KATA_KATAKANA, ...KATA_CAMPURAN];
 }
 
@@ -966,7 +1016,33 @@ export function selesaiKuisN(): void {
     const lagi = document.getElementById('lagi-n');
     if (lagi) lagi.addEventListener('click', soalBaruN);
     gambarBeranda();
-    gambarRingkasHarian();
+  document.addEventListener('keydown', function (e) {
+    const areaKuis = document.getElementById('area-kuis');
+    const areaMirip = document.getElementById('area-kuis-mirip');
+    const aktif = areaKuis && !areaKuis.classList.contains('sembunyi') && areaKuis.innerHTML.trim() !== '';
+    const miripAktif = areaMirip && !areaMirip.classList.contains('sembunyi') && areaMirip.innerHTML.trim() !== '';
+    if (!aktif && !miripAktif) return;
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+
+    const tombolJawab = document.querySelectorAll('.tombol-jawab:not(:disabled)') as NodeListOf<HTMLButtonElement>;
+    const tombolLanjut = document.getElementById('tombol-lanjut') || document.getElementById('lanjut-mirip');
+    const tombolPetunjuk = document.getElementById('tombol-petunjuk') || document.getElementById('petunjuk-mirip');
+
+    if (e.key >= '1' && e.key <= '4') {
+      const idx = parseInt(e.key) - 1;
+      if (tombolJawab[idx]) tombolJawab[idx].click();
+    }
+
+    if (e.key === ' ' || e.key === 'Enter') {
+      if (tombolLanjut) { e.preventDefault(); tombolLanjut.click(); }
+    }
+
+    if (e.key.toLowerCase() === 'h') {
+      if (tombolPetunjuk) tombolPetunjuk.click();
+    }
+  });
+
+  gambarRingkasHarian();
     return;
   }
 
@@ -983,6 +1059,7 @@ export function selesaiKuisN(): void {
       <p>Keadaan materi yang tadi kamu latih:</p>
       <ul class="rincian-status besar">
         <li><span class="titik dikuasai"></span> Sudah dikuasai: ${r.dikuasai} ${satuan}</li>
+        <li><span class="titik hampir"></span> Hampir hafal: ${r.hampir} ${satuan}</li>
         <li><span class="titik dilatih"></span> Masih dilatih: ${r.dilatih} ${satuan}</li>
         <li><span class="titik belum"></span> Belum disentuh: ${r.belum} ${satuan}</li>
       </ul>
@@ -1054,6 +1131,8 @@ export function inisialisasiKuisListeners(): void {
       const pil = (e.target as HTMLElement).closest('.pil') as HTMLElement;
       if (!pil || !pil.dataset.materi) return;
       materiKuis = pil.dataset.materi;
+      labelKuis = pil.textContent || pil.dataset.materi;
+      materiKustom = [];
       pilihPil('pilih-materi', materiKuis, 'materi');
     });
   }
@@ -1101,6 +1180,60 @@ export function inisialisasiKuisListeners(): void {
 
   const kGrammar = document.getElementById('mulai-kuis-grammar');
   if (kGrammar) kGrammar.addEventListener('click', () => mulaiKuisN('grammar'));
+
+  const tesBarisBtn = document.getElementById('tes-baris-ini');
+  if (tesBarisBtn) {
+    tesBarisBtn.addEventListener('click', function () {
+      const daftar = daftarSistem();
+      const tampil = barisAktif === 'semua' ? daftar : daftar.filter(k => k.baris === barisAktif);
+      if (tampil.length === 0) return;
+
+      let label = '';
+      if (barisAktif === 'semua') {
+        label = sistemAktif === 'hiragana' ? 'Tes hiragana'
+             : sistemAktif === 'katakana' ? 'Tes katakana'
+             : sistemAktif === 'dakuten' ? 'Tes dakuten & handakuten'
+             : sistemAktif === 'youon' ? 'Tes youon'
+             : 'Tes bunyi serapan';
+      } else {
+        label = 'Tes ' + tampil.map(k => k.kana).join('');
+      }
+      kumpulanKuisKustom(tampil, label);
+    });
+  }
+
+  const tesSemuaBtn = document.getElementById('tes-semua-dipelajari');
+  if (tesSemuaBtn) {
+    tesSemuaBtn.addEventListener('click', function () {
+      const daftar = daftarSistem();
+      const sudah = daftar.filter(k => {
+        const kartu = PROGRES.kartu[(k.tipe || 'serapan') + '-' + k.kana];
+        return kartu && kartu.kaliDilihat > 0;
+      });
+      if (sudah.length === 0) {
+        alert('Belum ada huruf yang pernah kamu latih di bagian ini. Pelajari dulu satu baris, lalu kembali ke sini.');
+        return;
+      }
+      const nama = sistemAktif === 'hiragana' ? 'hiragana'
+                : sistemAktif === 'katakana' ? 'katakana'
+                : sistemAktif === 'dakuten' ? 'dakuten & handakuten'
+                : sistemAktif === 'youon' ? 'youon'
+                : 'bunyi serapan';
+      kumpulanKuisKustom(sudah, 'Tes semua ' + nama + ' yang sudah dipelajari');
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    const tombol = (e.target as HTMLElement).closest('[data-aksi="ganti-setelan-kuis"]') as HTMLElement;
+    if (!tombol) return;
+    const area = document.getElementById('area-kuis');
+    if (area) {
+      area.classList.add('sembunyi');
+      area.innerHTML = '';
+    }
+    const setelan = document.getElementById('setelan-latihan');
+    if (setelan) setelan.classList.remove('sembunyi');
+  });
 
   gambarRingkasHarian();
 }

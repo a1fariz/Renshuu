@@ -5,11 +5,13 @@ import { KANJI_N5, KANJI_N4, SEMUA_KANJI, TEMA_KANJI } from '../data/kanji';
 import { KOSAKATA_N5, KOSAKATA_N4, SEMUA_KOSAKATA, TEMA_KOSAKATA } from '../data/kosakata';
 import { GRAMMAR_BELAJAR_N5, GRAMMAR_BELAJAR_N4, SEMUA_GRAMMAR } from '../data/grammar';
 import { PETA_JALAN, METODE, RUTINITAS_HARIAN } from '../data/peta';
+import { KONSEP_UTAMA, RINGKASAN_PANEL } from '../data/konsep';
 import {
   muatProgres, statusKartu, labelStatus, ringkasProgres, kartuJatuhTempo,
-  exportProgres, importProgres, resetProgres
+  exportProgres, importProgres, resetProgres, hariIni, hitungStreak
 } from '../services/srs';
 import { ucapkan } from '../services/speech';
+import { kumpulanKuisKustom } from './kuis';
 import type { KanaItem, KanjiItem, KosakataItem, GrammarBelajar, ProgresSRS } from '../types';
 
 export let PROGRES: ProgresSRS = muatProgres();
@@ -42,6 +44,111 @@ export function kosakataTampil(): KosakataItem[] {
   return daftar;
 }
 
+export function gambarKonsep(): void {
+  let html = '';
+  KONSEP_UTAMA.forEach((k, i) => {
+    const detailHtml = k.detail
+      .split('\n')
+      .map(par => par.trim() ? `<p>${par}</p>` : '')
+      .join('');
+
+    html += `
+      <div class="panel konsep-kartu">
+        <h2>${k.judul}</h2>
+        <p class="konsep-ringkas">${k.ringkas}</p>
+        ${detailHtml ? `
+          <button class="tombol halus kecil" data-toggle-detail="${i}">Baca lebih detail</button>
+          <div class="konsep-detail sembunyi" id="detail-konsep-${i}">${detailHtml}</div>
+        ` : ''}
+        ${k.contoh && k.contoh.length ? `
+          <ul class="daftar-contoh">
+            ${k.contoh.map(c => `
+              <li>
+                <span class="contoh-kata">${c.jp}</span>
+                <span class="contoh-baca">${c.baca}</span>
+                <span class="contoh-arti">${c.arti}</span>
+                <button class="tombol-suara" data-ucap="${c.jp}" title="Dengarkan">&#9834;</button>
+              </li>`).join('')}
+          </ul>` : ''}
+      </div>`;
+  });
+
+  const elem = document.getElementById('daftar-konsep');
+  if (elem) elem.innerHTML = html;
+}
+
+export function gambarRingkasanBelajar(): void {
+  const info = RINGKASAN_PANEL[sistemAktif];
+  if (!info) return;
+
+  const judul = document.getElementById('konsep-judul-belajar');
+  const isi = document.getElementById('isi-konsep-belajar');
+  const toggle = document.getElementById('toggle-konsep-belajar');
+
+  if (judul) judul.textContent = info.judul;
+  if (isi) {
+    isi.innerHTML = `
+      <p>${info.isi}</p>
+      <p class="catatan-kecil">
+        Penjelasan lengkapnya ada di halaman <button class="link-btn" data-pintasan="konsep">Konsep</button>.
+      </p>`;
+  }
+  if (toggle) {
+    toggle.setAttribute('aria-expanded', 'false');
+    const ikon = toggle.querySelector('.toggle-ikon');
+    if (ikon) ikon.textContent = '+';
+  }
+  if (isi) isi.classList.add('sembunyi');
+}
+
+export function gambarAreaTes(): void {
+  const wadah = document.getElementById('area-tes-baris');
+  if (!wadah) return;
+
+  const daftar = daftarSistem();
+  const tampil = barisAktif === 'semua' ? daftar : daftar.filter(k => k.baris === barisAktif);
+
+  if (tampil.length === 0) {
+    wadah.classList.add('sembunyi');
+    return;
+  }
+
+  const tombolBaris = document.getElementById('tes-baris-ini');
+  const label = document.getElementById('label-tes-baris');
+
+  let namaKelompok = '';
+  if (barisAktif === 'semua') {
+    namaKelompok = sistemAktif === 'hiragana' ? 'hiragana'
+                 : sistemAktif === 'katakana' ? 'katakana'
+                 : sistemAktif === 'dakuten' ? 'dakuten & handakuten'
+                 : sistemAktif === 'youon' ? 'youon'
+                 : 'bunyi serapan';
+  } else {
+    const contoh = tampil.map(k => k.kana).join('');
+    namaKelompok = `baris ${contoh}`;
+  }
+
+  if (tombolBaris) tombolBaris.textContent = `Tes ${namaKelompok}`;
+  if (label) {
+    const daftarId = tampil.map(k => (k.tipe || 'serapan') + '-' + k.kana);
+    const r = ringkasProgres(PROGRES, daftarId);
+    if (r.dikuasai > 0 || r.dilatih > 0) {
+      label.innerHTML = `Sudah ada <strong>${r.dikuasai + r.dilatih} huruf</strong> yang kamu sentuh di ${namaKelompok}. ` +
+        'Tes campuran untuk memastikan kamu benar-benar hafal, bukan cuma hafal urutan.';
+    } else {
+      label.textContent = 'Cek apakah materi ini sudah menempel sebelum lanjut ke berikutnya.';
+    }
+  }
+  wadah.classList.remove('sembunyi');
+}
+
+export function perbaruiTampilanBelajar(): void {
+  gambarPilihBaris();
+  gambarGridKana();
+  gambarRingkasanBelajar();
+  gambarAreaTes();
+}
+
 export let levelGrammar = 'N5';
 
 export function grammarTampil(): GrammarBelajar[] {
@@ -50,17 +157,28 @@ export function grammarTampil(): GrammarBelajar[] {
 
 export function bukaHalaman(nama: string): void {
   document.querySelectorAll('.halaman').forEach(h => h.classList.remove('aktif'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktif'));
 
   const halaman = document.getElementById('halaman-' + nama);
   if (halaman) halaman.classList.add('aktif');
 
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('aktif'));
   const tombol = document.querySelector(`.nav-btn[data-halaman="${nama}"]`);
-  if (tombol) tombol.classList.add('aktif');
+  if (tombol) {
+    tombol.classList.add('aktif');
+    const grup = tombol.closest('.nav-grup');
+    if (grup) grup.querySelector('.nav-grup-induk')?.classList.add('aktif');
+  }
+
+  const nav = document.getElementById('nav');
+  if (nav) nav.classList.remove('terbuka');
+  const hamburger = document.getElementById('nav-hamburger');
+  if (hamburger) hamburger.textContent = '☰';
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (nama === 'beranda') gambarBeranda();
+  if (nama === 'konsep') gambarKonsep();
+  if (nama === 'belajar') perbaruiTampilanBelajar();
 }
 
 export function pilihPil(idWadah: string, nilai: string, namaData: string): void {
@@ -74,20 +192,27 @@ export function pilihPil(idWadah: string, nilai: string, namaData: string): void
 
 export function kartuRingkas(nama: string, daftarId: string[], satuan: string): string {
   const r = ringkasProgres(PROGRES, daftarId);
+  const total = daftarId.length;
+  const persen = total > 0 ? Math.round((r.dikuasai / total) * 100) : 0;
   return `
     <div class="kartu-ringkas">
       <h3>${nama}</h3>
+      <div class="progres-angka">
+        <strong>${r.dikuasai} / ${total}</strong> ${satuan} dikuasai
+        <span class="persen">${persen}%</span>
+      </div>
       <div class="bar-status">
         <span class="bar dikuasai" style="flex:${r.dikuasai || 0.001}"></span>
+        <span class="bar hampir" style="flex:${r.hampir || 0.001}"></span>
         <span class="bar dilatih" style="flex:${r.dilatih || 0.001}"></span>
         <span class="bar belum" style="flex:${r.belum || 0.001}"></span>
       </div>
       <ul class="rincian-status">
-        <li><span class="titik dikuasai"></span> Sudah dikuasai: ${r.dikuasai} ${satuan}</li>
-        <li><span class="titik dilatih"></span> Masih dilatih: ${r.dilatih} ${satuan}</li>
-        <li><span class="titik belum"></span> Belum disentuh: ${r.belum} ${satuan}</li>
+        <li><span class="titik dikuasai"></span> Dikuasai: ${r.dikuasai}</li>
+        <li><span class="titik hampir"></span> Hampir hafal: ${r.hampir}</li>
+        <li><span class="titik dilatih"></span> Masih dilatih: ${r.dilatih}</li>
+        <li><span class="titik belum"></span> Belum disentuh: ${r.belum}</li>
       </ul>
-      <p class="total-kecil">dari ${daftarId.length} ${satuan}</p>
     </div>`;
 }
 
@@ -112,10 +237,10 @@ export function gambarTugasHariIni(): void {
     html += `
       <div class="tugas">
         <div class="tugas-teks">
-          <strong>${jatuhTempo.length} huruf perlu diulang hari ini</strong>
+          <strong>Review hari ini: ${jatuhTempo.length} huruf jatuh tempo</strong>
           <span>Ini yang paling penting. Kerjakan ini dulu sebelum menambah huruf baru.</span>
         </div>
-        <button class="tombol utama" data-pintasan="latihan-jatuhtempo">Ulang sekarang</button>
+        <button class="tombol utama" data-pintasan="latihan-jatuhtempo">Mulai review</button>
       </div>`;
   } else if (antreanLanjut.length === 0) {
     html += `
@@ -140,6 +265,10 @@ export function gambarTugasHariIni(): void {
 
   if (belumTersentuh.length > 0) {
     const berikutnya = SEMUA_KANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+    const limaBerikutnya = SEMUA_KANA
+      .filter(k => !PROGRES.kartu[k.tipe + '-' + k.kana])
+      .slice(0, 5);
+
     if (berikutnya) {
       html += `
         <div class="tugas">
@@ -150,7 +279,70 @@ export function gambarTugasHariIni(): void {
           <button class="tombol" data-pintasan="belajar">Pelajari</button>
         </div>`;
     }
+
+    const disentuhHariIni = SEMUA_KANA.filter(k => {
+      const kartu = PROGRES.kartu[k.tipe + '-' + k.kana];
+      return kartu && kartu.terakhirDilihat === hariIni() && kartu.kaliDilihat === 1;
+    }).length;
+
+    const targetTerpenuhi = disentuhHariIni >= 5;
+
+    html += `
+      <div class="target-hari-ini">
+        <h3>Target hari ini: 5 huruf baru <span class="persen">(${Math.min(disentuhHariIni, 5)}/5 hari ini)</span></h3>
+        <p class="petunjuk-kecil">Aplikasi yang memilih, kamu tinggal jalan. Disentuh sekali lewat Uji Saya atau Latihan sudah dihitung.</p>
+        ${targetTerpenuhi ? `<p class="pesan-target-terpenuhi"><strong>Target hari ini terpenuhi.</strong> Besok ada 5 huruf baru menunggu.</p>` : ''}
+        <ul class="target-list">
+          ${limaBerikutnya.map(k => {
+            const kartu = PROGRES.kartu[k.tipe + '-' + k.kana];
+            const selesaiKem = kartu && kartu.kaliDilihat > 0;
+            return `
+            <li class="${selesaiKem ? 'selesai' : ''}">
+              <span class="target-kana">${k.kana}</span>
+              <span class="target-romaji">${k.romaji}</span>
+              <button class="tombol halus kecil" data-uji-satu="${kartuKunci(k)}">Uji</button>
+            </li>`;
+          }).join('')}
+        </ul>
+        ${targetTerpenuhi ? '' : '<button class="tombol utama" data-pintasan="uji-target">Uji 5 huruf ini</button>'}
+      </div>`;
+  } else {
+    html += `
+      <div class="target-hari-ini">
+        <h3>Semua kana sudah kamu sentuh</h3>
+        <p class="petunjuk-kecil">Target berikutnya bertambah sampai N5/N4. Sekarang fokus ke ulangan.</p>
+      </div>`;
   }
+
+  const { streak, hariAktif } = hitungStreak(PROGRES);
+  const hariIniStr = hariIni();
+  const sudahHariIni = hariAktif.has(hariIniStr);
+
+  let kalenderHtml = '<div class="kalender-mini">';
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const tgl = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const aktif = hariAktif.has(tgl);
+    const hariIni = i === 0;
+    const label = d.getDate();
+    kalenderHtml += `<span class="hari-kal ${aktif ? 'aktif' : ''} ${hariIni ? 'ini' : ''}" title="${tgl}">${label}</span>`;
+  }
+  kalenderHtml += '</div>';
+
+  html += `
+    <div class="streak-panel">
+      <div class="streak-info">
+        <div class="streak-angka">
+          <strong>${streak}</strong>
+          <span>hari berturut-turut</span>
+        </div>
+        ${sudahHariIni
+          ? '<span class="streak-hari-ini selesai">Hari ini sudah aktif</span>'
+          : '<span class="streak-hari-ini">Belum latihan hari ini</span>'}
+      </div>
+      ${kalenderHtml}
+    </div>`;
 
   html += `
     <div class="rutinitas">
@@ -164,6 +356,94 @@ export function gambarTugasHariIni(): void {
 
   const elem = document.getElementById('tugas-hari-ini');
   if (elem) elem.innerHTML = html;
+}
+
+export function gambarPanduanLangkah(): void {
+  const idHiragana = HIRAGANA.map(k => k.tipe + '-' + k.kana);
+  const idKatakana = KATAKANA.map(k => k.tipe + '-' + k.kana);
+  const idDakuten = [...DAKUTEN, ...HANDAKUTEN].map(k => k.tipe + '-' + k.kana);
+  const idYouon = YOUON.map(k => k.tipe + '-' + k.kana);
+
+  const hDikuasai = ringkasProgres(PROGRES, idHiragana).dikuasai;
+  const kDikuasai = ringkasProgres(PROGRES, idKatakana).dikuasai;
+  const dDikuasai = ringkasProgres(PROGRES, idDakuten).dikuasai;
+  const yDikuasai = ringkasProgres(PROGRES, idYouon).dikuasai;
+
+  const adaProgres = (hDikuasai + kDikuasai + dDikuasai + yDikuasai) > 0;
+
+  if (!adaProgres) {
+    const htmlLangkah = `
+      <ol class="daftar-langkah">
+        <li>
+          <span class="langkah-nomor">1</span>
+          <div class="langkah-teks">
+            <strong>Pahami dulu apa yang kamu pelajari</strong>
+            <p>Bahasa Jepang punya dua huruf bunyi yang bunyinya sama tapi fungsinya beda. Baca penjelasan singkatnya supaya tidak bingung di tengah jalan.</p>
+          </div>
+          <button class="tombol" data-pintasan="konsep">Buka Konsep</button>
+        </li>
+        <li>
+          <span class="langkah-nomor">2</span>
+          <div class="langkah-teks">
+            <strong>Pelajari baris pertama: あいうえお</strong>
+            <p>Satu-satunya baris yang murni vokal. Setelah ini, semua baris lain hanya menempelkan konsonan ke depannya.</p>
+          </div>
+          <button class="tombol utama" data-pintasan="belajar-a">Mulai baris あ</button>
+        </li>
+        <li>
+          <span class="langkah-nomor">3</span>
+          <div class="langkah-teks">
+            <strong>Uji ingatanmu</strong>
+            <p>Setelah merasa hafal, pastikan lewat halaman Latihan. Pilih "Yang sudah kupelajari" untuk tes campuran.</p>
+          </div>
+          <button class="tombol" data-pintasan="latihan">Buka Latihan</button>
+        </li>
+      </ol>`;
+    const elem = document.getElementById('panduan-langkah');
+    if (elem) elem.innerHTML = htmlLangkah;
+    const panel = document.getElementById('panel-pintasan');
+    if (panel) panel.classList.add('sembunyi');
+    return;
+  }
+
+  const elemen = document.getElementById('panel-pintasan');
+  if (elemen) elemen.classList.remove('sembunyi');
+
+  let pesan = '';
+  let tombolHtml = '';
+
+  if (hDikuasai < HIRAGANA.length) {
+    const berikutnya = HIRAGANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+    pesan = `Kamu masih di bagian hiragana. ${hDikuasai} dari ${HIRAGANA.length} huruf sudah dikuasai. ` +
+      (berikutnya ? `Lanjutkan ke huruf berikutnya: <strong>${berikutnya.kana} (${berikutnya.romaji})</strong>.` : 'Tinggal sedikit lagi.');
+    tombolHtml = `<button class="tombol utama" data-pintasan="belajar">Lanjutkan hiragana</button>`;
+  } else if (dDikuasai < idDakuten.length) {
+    pesan = 'Hiragana sudah lengkap. Sekarang kuasai dakuten dan youon.';
+    tombolHtml = `<button class="tombol utama" data-pintasan="belajar-dakuten">Pelajari dakuten</button>`;
+  } else if (yDikuasai < idYouon.length) {
+    pesan = 'Dakuten selesai. Tinggal youon (bunyi gabungan seperti kya, shu, cho) sebelum pindah ke katakana.';
+    tombolHtml = `<button class="tombol utama" data-pintasan="belajar-youon">Pelajari youon</button>`;
+  } else if (kDikuasai < KATAKANA.length) {
+    const berikutnya = KATAKANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+    pesan = `Sekarang bagian katakana. ${kDikuasai} dari ${KATAKANA.length} huruf sudah dikuasai. ` +
+      (berikutnya ? `Huruf berikutnya: <strong>${berikutnya.kana} (${berikutnya.romaji})</strong>.` : '');
+    tombolHtml = `<button class="tombol utama" data-pintasan="belajar-katakana">Lanjutkan katakana</button>`;
+  } else {
+    pesan = 'Kana lengkap. Saatnya menguji dengan membaca kata utuh, bukan huruf lepas.';
+    tombolHtml = `<button class="tombol utama" data-pintasan="baca">Baca kata utuh</button>`;
+  }
+
+  const htmlLangkah = `
+    <div class="tugas">
+      <div class="tugas-teks">
+        <strong>Langkahmu berikutnya</strong>
+        <p style="margin:0;font-size:14px;color:var(--teks-lembut)">${pesan}</p>
+      </div>
+      ${tombolHtml}
+    </div>`;
+
+  const elem = document.getElementById('panduan-langkah');
+  if (elem) elem.innerHTML = htmlLangkah;
 }
 
 export function gambarBeranda(): void {
@@ -197,6 +477,7 @@ export function gambarBeranda(): void {
   const ringkasBeranda = document.getElementById('ringkas-beranda');
   if (ringkasBeranda) ringkasBeranda.innerHTML = html;
   gambarTugasHariIni();
+  gambarPanduanLangkah();
 }
 
 export function daftarSistem(): KanaItem[] {
@@ -230,15 +511,20 @@ export function gambarPilihBaris(): void {
   wadah.innerHTML = html;
 }
 
+export function kartuKunci(k: KanaItem): string {
+  return (k.tipe || 'serapan') + '-' + k.kana;
+}
+
 export function gambarGridKana(): void {
   const daftar = daftarSistem();
   const tampil = barisAktif === 'semua' ? daftar : daftar.filter(k => k.baris === barisAktif);
 
   let html = '';
   tampil.forEach(k => {
-    const id = (k.tipe || 'serapan') + '-' + k.kana;
+    const id = kartuKunci(k);
     const kartu = PROGRES.kartu[id];
     const status = statusKartu(kartu);
+    const tersentuh = kartu && kartu.kaliDilihat > 0;
 
     const contohHtml = (k.contoh || []).map(c => `
       <li>
@@ -248,19 +534,26 @@ export function gambarGridKana(): void {
       </li>`).join('');
 
     html += `
-      <div class="kartu-kana status-${status}">
+      <div class="kartu-kana status-${status}" data-jenis="kana">
         <div class="kartu-kepala">
           <span class="kana-besar">${k.kana}</span>
           <div class="kartu-info">
             <span class="romaji">${k.romaji}</span>
             <span class="lencana ${status}">${labelStatus(status)}</span>
           </div>
-          <button class="tombol-suara" data-ucap="${k.kana}" title="Dengarkan">&#9834;</button>
         </div>
-        ${(k as any).asal ? `<p class="asal">Dari huruf <strong>${(k as any).asal}</strong> + tanda ${k.tipe === 'dakuten' ? 'dakuten ゛' : 'handakuten ゜'}</p>` : ''}
-        ${k.mnemonic ? `<p class="mnemonic"><strong>Cara mengingat:</strong> ${k.mnemonic}</p>` : ''}
-        ${k.coretan ? `<p class="coretan"><strong>Urutan coretan:</strong> ${k.coretan}</p>` : ''}
-        ${contohHtml ? `<ul class="daftar-contoh">${contohHtml}</ul>` : ''}
+        <div class="kartu-aksi">
+          <button class="tombol halus kecil tombol-dengar" data-ucap="${k.kana}">&#9834; Dengar</button>
+          <button class="tombol halus kecil" data-tulis="${id}">&#9998; Tulis</button>
+          <button class="tombol halus kecil" data-uji-satu="${id}">Uji saya</button>
+        </div>
+        <details class="kartu-detail" ${tersentuh ? '' : 'open'}>
+          <summary>Cara ingat, coretan &amp; contoh</summary>
+          ${(k as any).asal ? `<p class="asal">Dari huruf <strong>${(k as any).asal}</strong> + tanda ${k.tipe === 'dakuten' ? 'dakuten ゛' : 'handakuten ゜'}</p>` : ''}
+          ${k.mnemonic ? `<p class="mnemonic"><strong>Cara mengingat:</strong> ${k.mnemonic}</p>` : ''}
+          ${k.coretan ? `<p class="coretan"><strong>Urutan coretan:</strong> ${k.coretan}</p>` : ''}
+          ${contohHtml ? `<ul class="daftar-contoh">${contohHtml}</ul>` : ''}
+        </details>
       </div>`;
   });
 
@@ -395,7 +688,7 @@ export function gambarGridKanji(): void {
       </li>`).join('');
 
     html += `
-      <div class="kartu-kana status-${status}">
+      <div class="kartu-kana kartu-kanji status-${status}" data-jenis="kanji">
         <div class="kartu-kepala">
           <span class="kana-besar">${k.kanji}</span>
           <div class="kartu-info">
@@ -493,6 +786,26 @@ export function gambarDaftarGrammar(): void {
 }
 
 export function inisialisasiAppListeners(): void {
+  const temaTersimpan = localStorage.getItem('renshuu-tema');
+  if (temaTersimpan === 'gelap') document.documentElement.setAttribute('data-theme', 'gelap');
+  else if (!temaTersimpan && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.setAttribute('data-theme', 'gelap');
+  }
+
+  const toggleGelap = document.getElementById('toggle-gelap');
+  if (toggleGelap) {
+    toggleGelap.addEventListener('click', function () {
+      const gelap = document.documentElement.getAttribute('data-theme') === 'gelap';
+      if (gelap) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('renshuu-tema', 'terang');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'gelap');
+        localStorage.setItem('renshuu-tema', 'gelap');
+      }
+    });
+  }
+
   const nav = document.getElementById('nav');
   if (nav) {
     nav.addEventListener('click', function (e) {
@@ -501,6 +814,31 @@ export function inisialisasiAppListeners(): void {
       if (tombol && tombol.dataset.halaman) bukaHalaman(tombol.dataset.halaman);
     });
   }
+
+  const hamburger = document.getElementById('nav-hamburger');
+  if (hamburger && nav) {
+    hamburger.addEventListener('click', function () {
+      const terbuka = nav.classList.toggle('terbuka');
+      hamburger.textContent = terbuka ? '×' : '☰';
+    });
+  }
+
+  document.querySelectorAll('.nav-grup-induk').forEach(induk => {
+    induk.addEventListener('click', function (this: HTMLElement, e: Event) {
+      e.stopPropagation();
+      const grup = this.closest('.nav-grup');
+      if (!grup) return;
+      const sudahTerbuka = grup.classList.contains('terbuka');
+      document.querySelectorAll('.nav-grup.terbuka').forEach(g => g.classList.remove('terbuka'));
+      if (!sudahTerbuka) grup.classList.add('terbuka');
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!(e.target as HTMLElement).closest('.nav-grup')) {
+      document.querySelectorAll('.nav-grup.terbuka').forEach(g => g.classList.remove('terbuka'));
+    }
+  });
 
   document.addEventListener('click', function (e) {
     const target = e.target as HTMLElement;
@@ -512,12 +850,42 @@ export function inisialisasiAppListeners(): void {
       sistemAktif = 'hiragana';
       barisAktif = 'a';
       bukaHalaman('belajar');
-      gambarPilihBaris();
-      gambarGridKana();
-    } else if (aksi === 'belajar') {
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'belajar' || aksi === 'belajar-hiragana') {
+      const berikutnya = SEMUA_KANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+      if (berikutnya) {
+        sistemAktif = berikutnya.tipe === 'handakuten' ? 'dakuten' : berikutnya.tipe;
+        barisAktif = berikutnya.baris || 'semua';
+      }
       bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'belajar-katakana') {
+      sistemAktif = 'katakana';
+      barisAktif = 'semua';
+      bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'belajar-dakuten') {
+      sistemAktif = 'dakuten';
+      barisAktif = 'semua';
+      bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'belajar-youon') {
+      sistemAktif = 'youon';
+      barisAktif = 'semua';
+      bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'konsep') {
+      bukaHalaman('konsep');
+    } else if (aksi === 'baca') {
+      bukaHalaman('baca');
     } else if (aksi === 'latihan') {
       bukaHalaman('latihan');
+      const areaKuis = document.getElementById('area-kuis');
+      const setelan = document.getElementById('setelan-latihan');
+      if (areaKuis && areaKuis.innerHTML.trim() === '') {
+        areaKuis.classList.add('sembunyi');
+        if (setelan) setelan.classList.remove('sembunyi');
+      }
     } else if (aksi === 'mirip') {
       bukaHalaman('mirip');
     } else if (aksi === 'buka-kanji') {
@@ -526,10 +894,58 @@ export function inisialisasiAppListeners(): void {
       bukaHalaman('kosakata');
     } else if (aksi === 'buka-grammar') {
       bukaHalaman('grammar');
+    } else if (aksi === 'uji-target') {
+      const lima = SEMUA_KANA
+        .filter(k => !PROGRES.kartu[k.tipe + '-' + k.kana])
+        .slice(0, 5);
+      if (lima.length > 0) {
+        kumpulanKuisKustom(lima, 'Target hari ini: ' + lima.map(k => k.kana).join(' '));
+      }
+    } else if (aksi === 'latihan-jatuhtempo') {
+      const semuaId = SEMUA_KANA.map(k => k.tipe + '-' + k.kana);
+      const tempo = kartuJatuhTempo(PROGRES, semuaId);
+      const daftar = SEMUA_KANA.filter(k => tempo.includes(k.tipe + '-' + k.kana));
+      if (daftar.length > 0) {
+        kumpulanKuisKustom(daftar, `Review hari ini: ${daftar.length} huruf`);
+      } else {
+        bukaHalaman('latihan');
+      }
     } else if (aksi === 'buka-sumber') {
       bukaHalaman('sumber');
     }
   });
+
+  document.addEventListener('click', function (e) {
+    const tombol = (e.target as HTMLElement).closest('[data-uji-satu]') as HTMLElement;
+    if (!tombol || !tombol.dataset.ujiSatu) return;
+    const item = SEMUA_KANA.find(x => kartuKunci(x) === tombol.dataset.ujiSatu);
+    if (item) {
+      kumpulanKuisKustom([item], 'Uji huruf ' + item.kana);
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    const target = e.target as HTMLElement;
+    const tombol = target.closest('[data-toggle-detail]') as HTMLElement;
+    if (!tombol) return;
+    const id = tombol.dataset.toggleDetail;
+    const detail = document.getElementById('detail-konsep-' + id);
+    if (!detail) return;
+    const tersembunyi = detail.classList.toggle('sembunyi');
+    tombol.textContent = tersembunyi ? 'Baca lebih detail' : 'Tutup detail';
+  });
+
+  const toggleKonsep = document.getElementById('toggle-konsep-belajar');
+  if (toggleKonsep) {
+    toggleKonsep.addEventListener('click', function () {
+      const isi = document.getElementById('isi-konsep-belajar');
+      if (!isi) return;
+      const tersembunyi = isi.classList.toggle('sembunyi');
+      this.setAttribute('aria-expanded', String(!tersembunyi));
+      const ikon = this.querySelector('.toggle-ikon');
+      if (ikon) ikon.textContent = tersembunyi ? '+' : '−';
+    });
+  }
 
   const pilihSistem = document.getElementById('pilih-sistem');
   if (pilihSistem) {
@@ -539,8 +955,7 @@ export function inisialisasiAppListeners(): void {
       sistemAktif = pil.dataset.sistem;
       barisAktif = 'semua';
       pilihPil('pilih-sistem', sistemAktif, 'sistem');
-      gambarPilihBaris();
-      gambarGridKana();
+      perbaruiTampilanBelajar();
     });
   }
 
@@ -552,6 +967,7 @@ export function inisialisasiAppListeners(): void {
       barisAktif = pil.dataset.baris;
       gambarPilihBaris();
       gambarGridKana();
+      gambarAreaTes();
     });
   }
 

@@ -116,11 +116,12 @@ export interface ProgresSRS {
   versi: number;
 }
 
-export type StatusKartu = 'belum' | 'dilatih' | 'dikuasai';
+export type StatusKartu = 'belum' | 'dilatih' | 'hampir' | 'dikuasai';
 
 export interface HasilRingkasan {
   belum: number;
   dilatih: number;
+  hampir: number;
   dikuasai: number;
 }
 
