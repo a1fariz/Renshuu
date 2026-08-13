@@ -403,6 +403,82 @@ summary:focus-visible {
   gap: 10px;
 }
 
+.panel-judul-bantuan {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.panel-judul-bantuan h2 { margin-bottom: 4px; }
+.panel-judul-bantuan .petunjuk { margin-bottom: 0; }
+
+.pilihan-level { grid-template-columns: repeat(3, 1fr); }
+.pilihan-level .tombol { min-height: 176px; }
+
+.level-label,
+.eyebrow {
+  color: var(--aksen);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.arah-pilihan {
+  color: var(--aksen) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  margin-top: auto;
+}
+
+.level-pemula { border-color: color-mix(in srgb, var(--aksen) 45%, var(--garis)); }
+.level-mahir { border-color: color-mix(in srgb, var(--dikuasai) 45%, var(--garis)); }
+.pintasan-tambahan { margin-top: 10px; }
+
+.tutorial-pemula {
+  border-color: color-mix(in srgb, var(--aksen) 38%, var(--garis));
+  background: linear-gradient(135deg, var(--latar-panel), var(--aksen-lembut));
+}
+
+.tutorial-kepala {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.tutorial-kepala h2 { margin: 2px 0 4px; }
+.tutorial-kepala p { margin-bottom: 0; }
+.tutorial-estimasi {
+  color: var(--teks-lembut);
+  font-size: 12px;
+  white-space: nowrap;
+  padding-top: 4px;
+}
+
+.tutorial-rute {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.tutorial-rute li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  background: var(--latar-panel);
+  border: 1px solid var(--garis);
+  border-radius: 8px;
+}
+
+.tutorial-rute .langkah-nomor { width: 26px; height: 26px; font-size: 12px; }
+.tutorial-aksi { display: flex; gap: 10px; margin-top: 16px; }
+
 /* ---------------- RINGKASAN STATUS ---------------- */
 .kartu-baris {
   display: grid;
@@ -1684,6 +1760,13 @@ summary:focus-visible {
   .sambutan h1 { font-size: 25px; }
   .daftar-langkah li { flex-direction: column; gap: 10px; }
   .daftar-langkah li .tombol { align-self: flex-start; }
+  .panel-judul-bantuan,
+  .tutorial-kepala { flex-direction: column; }
+  .pilihan-level,
+  .tutorial-rute { grid-template-columns: 1fr; }
+  .pilihan-level .tombol { min-height: auto; }
+  .tutorial-estimasi { padding-top: 0; }
+  .tutorial-aksi { flex-direction: column; align-items: stretch; }
 
   .sambutan { padding: 22px 18px; }
   .topbar-inner { padding: 0 14px; }

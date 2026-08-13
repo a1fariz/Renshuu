@@ -421,7 +421,7 @@ export function gambarPanduanLangkah(): void {
     const elem = document.getElementById('panduan-langkah');
     if (elem) elem.innerHTML = htmlLangkah;
     const panel = document.getElementById('panel-pintasan');
-    if (panel) panel.classList.add('sembunyi');
+    if (panel) panel.classList.remove('sembunyi');
     return;
   }
 
@@ -886,7 +886,20 @@ export function inisialisasiAppListeners(): void {
     if (!tombol || !tombol.dataset.pintasan) return;
 
     const aksi = tombol.dataset.pintasan;
-    if (aksi === 'belajar-a') {
+    if (aksi === 'pilih-pemula') {
+      bukaHalaman('konsep');
+      document.getElementById('tutorial-pemula')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (aksi === 'pilih-kenal') {
+      const berikutnya = SEMUA_KANA.find(k => !PROGRES.kartu[k.tipe + '-' + k.kana]);
+      if (berikutnya) {
+        sistemAktif = berikutnya.tipe === 'handakuten' ? 'dakuten' : berikutnya.tipe;
+        barisAktif = berikutnya.baris || 'semua';
+      }
+      bukaHalaman('belajar');
+      perbaruiTampilanBelajar();
+    } else if (aksi === 'pilih-mahir') {
+      bukaHalaman('baca');
+    } else if (aksi === 'belajar-a') {
       sistemAktif = 'hiragana';
       barisAktif = 'a';
       bukaHalaman('belajar');
@@ -921,6 +934,8 @@ export function inisialisasiAppListeners(): void {
       perbaruiTampilanBelajar();
     } else if (aksi === 'konsep') {
       bukaHalaman('konsep');
+    } else if (aksi === 'peta') {
+      bukaHalaman('peta');
     } else if (aksi === 'baca') {
       bukaHalaman('baca');
     } else if (aksi === 'latihan') {

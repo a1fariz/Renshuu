@@ -89,23 +89,41 @@
       <div id="panduan-langkah"></div>
     </div>
 
-    <div class="panel" id="panel-pintasan">
-      <h2>Pintasan</h2>
-      <div class="pintasan">
-        <button class="tombol besar" data-pintasan="belajar-a">
-          <strong>Belum pernah belajar kana</strong>
-          <span>Mulai dari baris あ (a i u e o)</span>
+    <div class="panel panel-mulai" id="panel-pintasan">
+      <div class="panel-judul-bantuan">
+        <div>
+          <h2>Mulai dari mana?</h2>
+          <p class="petunjuk">Pilih yang paling mirip dengan kemampuanmu sekarang. Tidak yakin? Pilih <strong>belum tahu apa-apa</strong> — kamu akan diarahkan ke tutorial pertama.</p>
+        </div>
+        <button class="tombol halus kecil" data-pintasan="peta">Lihat peta belajar</button>
+      </div>
+      <div class="pintasan pilihan-level">
+        <button class="tombol besar level-pemula" data-pintasan="pilih-pemula">
+          <span class="level-label">LEVEL 1 · MULAI DARI NOL</span>
+          <strong>Aku belum tahu apa-apa</strong>
+          <span>Belum hafal hiragana? Mulai tutorial singkat lalu belajar baris あいうえお.</span>
+          <span class="arah-pilihan">Klik → Tutorial pemula → Belajar Huruf</span>
         </button>
+        <button class="tombol besar level-kenal" data-pintasan="pilih-kenal">
+          <span class="level-label">LEVEL 2 · SUDAH PERNAH BELAJAR</span>
+          <strong>Aku sudah tahu beberapa huruf</strong>
+          <span>Lanjutkan dari materi yang belum dikuasai, lalu cek ingatanmu lewat latihan.</span>
+          <span class="arah-pilihan">Klik → Materi berikutnya → Latihan</span>
+        </button>
+        <button class="tombol besar level-mahir" data-pintasan="pilih-mahir">
+          <span class="level-label">LEVEL 3 · SUDAH MAHIR KANA</span>
+          <strong>Aku sudah mahir membaca kana</strong>
+          <span>Lewati pengenalan huruf dan mulai membaca kata, lalu lanjut ke kosakata N5.</span>
+          <span class="arah-pilihan">Klik → Baca Kata → Kosakata N5</span>
+        </button>
+      </div>
+      <div class="pintasan pintasan-tambahan">
         <button class="tombol besar" data-pintasan="konsep">
           <strong>Masih bingung hiragana vs katakana?</strong>
           <span>Baca penjelasan singkatnya dulu</span>
         </button>
-        <button class="tombol besar" data-pintasan="latihan">
-          <strong>Sudah kenal beberapa huruf</strong>
-          <span>Langsung latihan campuran</span>
-        </button>
         <button class="tombol besar" data-pintasan="mirip">
-          <strong>Sering tertukar シ dan ツ</strong>
+          <strong>Sering tertukar シ dan ツ?</strong>
           <span>Latihan khusus huruf mirip</span>
         </button>
       </div>
@@ -120,6 +138,43 @@
       Bagian ini menjelaskan kenapa bahasa Jepang punya dua jenis huruf bunyi
       dan bagaimana cara paling efektif memakai aplikasi ini.
     </p>
+    <div class="panel tutorial-pemula" id="tutorial-pemula">
+      <div class="tutorial-kepala">
+        <div>
+          <span class="eyebrow">TUTORIAL PEMULA</span>
+          <h2>Rute belajar pertamamu</h2>
+          <p>Ikuti urutan ini. Kamu tidak perlu memilih materi sendiri atau langsung menghafal semuanya.</p>
+        </div>
+        <span class="tutorial-estimasi">10–15 menit pertama</span>
+      </div>
+      <ol class="tutorial-rute">
+        <li>
+          <span class="langkah-nomor">1</span>
+          <div class="langkah-teks">
+            <strong>Kenali dua jenis huruf</strong>
+            <p>Hiragana dipakai untuk kata dan tata bahasa Jepang. Katakana biasanya dipakai untuk kata serapan.</p>
+          </div>
+        </li>
+        <li>
+          <span class="langkah-nomor">2</span>
+          <div class="langkah-teks">
+            <strong>Mulai dari hiragana あいうえお</strong>
+            <p>Pelajari lima huruf vokal dulu. Baca mnemonic, lihat urutan coretan, lalu ucapkan contohnya.</p>
+          </div>
+        </li>
+        <li>
+          <span class="langkah-nomor">3</span>
+          <div class="langkah-teks">
+            <strong>Latihan setelah satu baris</strong>
+            <p>Jangan menunggu sampai semua huruf selesai. Tes baris yang baru dipelajari agar ingatan mulai kuat.</p>
+          </div>
+        </li>
+      </ol>
+      <div class="tutorial-aksi">
+        <button class="tombol utama" data-pintasan="belajar-a">Mulai belajar あいうえお</button>
+        <button class="tombol" data-pintasan="peta">Lihat rencana lengkap</button>
+      </div>
+    </div>
     <div id="daftar-konsep"></div>
   </section>
 
