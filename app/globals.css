@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --latar: #faf8f5;
+  --latar-panel: #ffffff;
+  --latar-lembut: #f2efea;
+  --teks: #2c2825;
+  --teks-lembut: #6b635c;
+  --garis: #e2ddd6;
+  --aksen: #b04a3f;
+  --aksen-gelap: #8f3a31;
+  --aksen-lembut: #fdf0ee;
+  --dikuasai: #4a7c59;
+  --hampir: #7c8b3c;
+  --dilatih: #c98a3c;
+  --belum: #c9c3bb;
+  --bayang: 0 1px 3px rgba(44, 40, 37, 0.06), 0 4px 12px rgba(44, 40, 37, 0.04);
+}
+
+[data-theme="gelap"] {
+  --latar: #1a1a1a;
+  --latar-panel: #242424;
+  --latar-lembut: #2e2e2e;
+  --teks: #e8e4e0;
+  --teks-lembut: #a09890;
+  --garis: #3a3530;
+  --aksen: #d4766c;
+  --aksen-gelap: #b85a50;
+  --aksen-lembut: #3a2020;
+  --dikuasai: #6aad7a;
+  --hampir: #9aab5a;
+  --dilatih: #d4a44a;
+  --belum: #555048;
+  --bayang: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+* { box-sizing: border-box; }
+html {
+  background: var(--latar);
+  transition: background 0.35s ease;
+}
+body {
+  margin: 0;
+  background: var(--latar);
+  color: var(--teks);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.35s ease, color 0.25s ease;
+}
+/* semua elemen ikut transisi warna saat ganti tema */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+/* kecuali animasi yang sudah punya timing sendiri */
+.transition-none, [class*="animate-"], [class*="transition-all"] {
+  transition-property: all;
+}
+button, input, select { font: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--aksen);
+  outline-offset: 3px;
+}
+.jp { font-family: "Yu Gothic", "Meiryo", "Hiragino Kaku Gothic ProN", "MS Gothic", "Noto Sans JP", sans-serif; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
